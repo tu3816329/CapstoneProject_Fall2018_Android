@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "861079830641",
+    "firebase_url": "https://mathnote-android.firebaseio.com",
+    "project_id": "mathnote-android",
+    "storage_bucket": "mathnote-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861079830641:android:a8b95301e4fc6848",
+        "android_client_info": {
+          "package_name": "com.example.capstone.mathnote_capstone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "861079830641-b20emlvc2fteu6k1sc2rba2l4495mkhl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.capstone.mathnote_capstone",
+            "certificate_hash": "fe7c8e114d62aaa7971cdf3985e61956f9678073"
+          }
+        },
+        {
+          "client_id": "861079830641-mp47jbbdvsrth8s34s0v401ljor92e28.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL3I8QgyYMuzFuA7WfN0xeT8cGqyXy5jc"
+        },
+        {
+          "current_key": "AIzaSyBL3I8QgyYMuzFuA7WfN0xeT8cGqyXy5jc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "861079830641-mp47jbbdvsrth8s34s0v401ljor92e28.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
