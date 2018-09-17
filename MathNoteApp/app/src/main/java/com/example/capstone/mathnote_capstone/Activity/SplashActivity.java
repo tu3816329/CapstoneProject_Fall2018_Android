@@ -12,7 +12,7 @@ import com.example.capstone.mathnote_capstone.R;
 
 public class SplashActivity extends AppCompatActivity {
     private ImageView logo;
-    private static int splashTimeOut=5000;
+    private static int splashTimeOut=2000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +23,7 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i = new Intent(SplashActivity.this, SplashActivity.class);
+                Intent i = new Intent(SplashActivity.this, InstructionActivity.class);
                 startActivity(i);
                 finish();
             }
