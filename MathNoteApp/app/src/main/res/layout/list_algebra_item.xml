@@ -3,21 +3,56 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/algebraTitle"
+    android:padding="16dp"
+    android:background="?selectableItemBackground"
+    android:paddingEnd="?listPreferredItemPaddingRight"
+    android:paddingLeft="?listPreferredItemPaddingLeft"
+    android:paddingRight="?listPreferredItemPaddingRight"
+    android:paddingStart="?listPreferredItemPaddingLeft">
+    <ImageView
+        android:id="@+id/img_title"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_action_name" />
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bất đẳng thức"
-        android:layout_marginLeft="12dp"
-        android:textSize="16dp"/>
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_toEndOf="@+id/img_title"
+        android:layout_toLeftOf="@+id/img_chevron_right"
+        android:layout_toRightOf="@+id/img_title"
+        android:layout_toStartOf="@+id/img_chevron_right"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
+        <TextView
+            android:id="@+id/algebraTitle"
+            style="@style/TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="Bất đẳng thức"
+            android:layout_marginLeft="12dp"
+            android:textSize="16dp"/>
+    </LinearLayout>
+
 
     <ImageView
+        android:id="@+id/img_chevron_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="24dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerInside"
         android:src="@drawable/ic_chevron_right_black_24dp"/>
 
 </RelativeLayout>
