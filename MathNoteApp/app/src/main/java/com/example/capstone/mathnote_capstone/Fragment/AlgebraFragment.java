@@ -33,11 +33,12 @@ public class AlgebraFragment extends Fragment {
         mListLabel.setLayoutManager(layoutManager);
 
         ArrayList<String> datatmp = new ArrayList<>();
-        datatmp.add("Số nguyên tố");
-        datatmp.add("Bất đẳng thức");
-        datatmp.add("Thập phân");
-        datatmp.add("Phân số");
-        datatmp.add("Bất đẳng thức");
+        datatmp.add("Mệnh Đề- Tập Hợp");
+        datatmp.add("Hàm Số Bậc Nhất, Bậc Hai");
+        datatmp.add("Phương Trình – Hệ Phương Trình");
+        datatmp.add("Bất Đẳng Thức – Bất Phương Trình");
+        datatmp.add("Thống Kê");
+        datatmp.add("Cung, Lượng Giác, Công Thức Lượng Giác");
 
         mAlgebraAdapter = new AlgebraAdapter(getContext(), datatmp);
         mListLabel.setAdapter(mAlgebraAdapter);
