@@ -23,11 +23,11 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/listAlgebraDetail"
-        android:layout_below="@+id/appBar_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
     </android.support.v7.widget.RecyclerView>
-
 </RelativeLayout>

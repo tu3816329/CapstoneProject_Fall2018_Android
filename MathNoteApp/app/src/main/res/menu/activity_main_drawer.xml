@@ -14,12 +14,12 @@
             android:title="Yêu Thích" />
         <item
             android:id="@+id/nav_test"
-            android:icon="@drawable/ic_book"
-            android:title="Slideshow" />
+            android:icon="@drawable/ic_test"
+            android:title="Kiểm Tra" />
         <item
             android:id="@+id/nav_tips"
             android:icon="@drawable/ic_tips"
-            android:title="Slideshow" />
+            android:title="Tips and Tricks" />
         <item
             android:id="@+id/nav_notes"
             android:icon="@drawable/ic_note"

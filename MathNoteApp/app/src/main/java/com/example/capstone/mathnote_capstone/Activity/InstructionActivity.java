@@ -49,7 +49,7 @@ public class InstructionActivity extends AppCompatActivity {
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(InstructionActivity.this, MainActivity.class);
+                Intent i = new Intent(InstructionActivity.this, GradeActivity.class);
                 startActivity(i);
                 finish();
             }
