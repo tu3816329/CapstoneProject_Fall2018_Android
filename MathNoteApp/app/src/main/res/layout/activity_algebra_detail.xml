@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="horizontal"
     android:background="@color/colorWhite"
-    tools:context=".Activity.AlgebraDetailActivity">
+    tools:context=".activity.AlgebraDetailActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -26,6 +27,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/listAlgebraDetail"
         android:layout_width="match_parent"
+        android:layout_below="@+id/appBar_id"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 

@@ -1,14 +1,40 @@
-package com.example.capstone.mathnote_capstone.Model;
+package com.example.capstone.mathnote_capstone.model;
 
-public class Grade {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class Grade implements Serializable {
+    @SerializedName("id")
+    @Expose
+    private int id;
+
+    @SerializedName("gradeName")
+    @Expose
     private String gradeName;
-    private int numberOfChapter;
-    private String img;
 
-    public Grade(String gradeName, int numberOfChapter, String img) {
+    @SerializedName("versionId")
+    @Expose
+    private Version version;
+
+    private boolean isChosen;
+    private int numOfChapters;
+
+    public Grade() {}
+
+    public Grade(int id, String gradeName, int numOfChapters) {
+        this.id = id;
         this.gradeName = gradeName;
-        this.numberOfChapter = numberOfChapter;
-        this.img = img;
+        this.numOfChapters = numOfChapters;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getGradeName() {
@@ -19,19 +45,66 @@ public class Grade {
         this.gradeName = gradeName;
     }
 
-    public int getNumberOfChapter() {
-        return numberOfChapter;
+    public Version getVersion() {
+        return version;
     }
 
-    public void setNumberOfChapter(int numberOfChapter) {
-        this.numberOfChapter = numberOfChapter;
+    public void setVersion(Version version) {
+        this.version = version;
     }
 
-    public String getImg() {
-        return img;
+    public boolean isChosen() {
+        return isChosen;
     }
 
-    public void setImg(String img) {
-        this.img = img;
+    public void setChosen(boolean chosen) {
+        isChosen = chosen;
     }
+
+    public int getNumOfChapters() {
+        return numOfChapters;
+    }
+
+    public void setNumOfChapters(int numOfChapters) {
+        this.numOfChapters = numOfChapters;
+    }
+
+    @Override
+    public String toString() {
+        return id + " | " + gradeName + " | " + version;
+    }
+
+//    private String gradeName;
+//    private int numberOfChapter;
+//    private String img;
+//
+//    public Grade(String gradeName, int numberOfChapter, String img) {
+//        this.gradeName = gradeName;
+//        this.numberOfChapter = numberOfChapter;
+//        this.img = img;
+//    }
+//
+//    public String getGradeName() {
+//        return gradeName;
+//    }
+//
+//    public void setGradeName(String gradeName) {
+//        this.gradeName = gradeName;
+//    }
+//
+//    public int getNumberOfChapter() {
+//        return numberOfChapter;
+//    }
+//
+//    public void setNumberOfChapter(int numberOfChapter) {
+//        this.numberOfChapter = numberOfChapter;
+//    }
+//
+//    public String getImg() {
+//        return img;
+//    }
+//
+//    public void setImg(String img) {
+//        this.img = img;
+//    }
 }

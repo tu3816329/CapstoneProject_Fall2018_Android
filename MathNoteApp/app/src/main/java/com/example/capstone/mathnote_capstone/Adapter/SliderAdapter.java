@@ -1,4 +1,4 @@
-package com.example.capstone.mathnote_capstone.Adapter;
+package com.example.capstone.mathnote_capstone.adapter;
 
 import android.content.Context;
 import android.support.v4.view.PagerAdapter;

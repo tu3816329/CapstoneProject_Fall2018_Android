@@ -1,4 +1,4 @@
-package com.example.capstone.mathnote_capstone.Adapter;
+package com.example.capstone.mathnote_capstone.adapter;
 
 
 import android.content.Context;
@@ -9,63 +9,108 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.capstone.mathnote_capstone.Activity.AlgebraDetailActivity;
+import com.example.capstone.mathnote_capstone.activity.AlgebraDetailActivity;
 import com.example.capstone.mathnote_capstone.R;
+import com.example.capstone.mathnote_capstone.model.Category;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
-public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.ViewHolder> implements Serializable {
+public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHolder>
+        implements Serializable {
 
-    private Context mContext;
-    private LayoutInflater mLayoutInflater;
-    private ArrayList<String> mLabels;
+    private List<Category> categories;
+    private Context context;
 
-    public AlgebraAdapter(Context mContext, ArrayList<String> mLabels) {
-        this.mContext = mContext;
-        this.mLabels = mLabels;
-        mLayoutInflater = LayoutInflater.from(mContext);
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+        public View categoryView;
+        public TextView categoryTv;
 
+        public MyViewHolder(View v) {
+            super(v);
+            categoryView = v;
+            categoryTv = v.findViewById(R.id.algebraTitle);
+        }
+    }
+
+    public AlgebraAdapter(Context context, List<Category> categories) {
+        this.context = context;
+        this.categories = categories;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mLayoutInflater.inflate(R.layout.list_algebra_item, parent, false);
-        return new ViewHolder(view);
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v = (View) LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.list_algebra_item, parent, false);
+        return new MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        final String title = mLabels.get(position);
-        holder.algebraTitle.setText(title);
-        holder.item.setOnClickListener(new View.OnClickListener() {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
+        holder.categoryTv.setText(categories.get(position).getCategoryName());
+        holder.categoryView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, AlgebraDetailActivity.class);
-                intent.putExtra("AlgebraTitle", title);
-                mContext.startActivity(intent);
+                Intent intent = new Intent(context, AlgebraDetailActivity.class);
+                intent.putExtra("categoryid", categories.get(position).getId());
+                intent.putExtra("categoryname", categories.get(position).getCategoryName());
+                context.startActivity(intent);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mLabels.size();
+        return categories.size();
     }
-
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        View item;
-        TextView algebraTitle;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            item = itemView;
-            algebraTitle = itemView.findViewById(R.id.algebraTitle);
-        }
-
-        @Override
-        public void onClick(View view) {
-
-        }
-    }
+//    private List<Category> categories;
+//    private Context context;
+//
+//    public AlgebraAdapter(Context mContext, ArrayList<String> mLabels) {
+//        this.mContext = mContext;
+//        this.mLabels = mLabels;
+//        mLayoutInflater = LayoutInflater.from(mContext);
+//
+//    }
+//
+//    @Override
+//    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//        View view = mLayoutInflater.inflate(R.layout.list_algebra_item, parent, false);
+//        return new ViewHolder(view);
+//    }
+//
+//    @Override
+//    public void onBindViewHolder(ViewHolder holder, int position) {
+//        final String title = mLabels.get(position);
+//        holder.algebraTitle.setText(title);
+//        holder.item.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(mContext, AlgebraDetailActivity.class);
+//                intent.putExtra("AlgebraTitle", title);
+//                mContext.startActivity(intent);
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public int getItemCount() {
+//        return mLabels.size();
+//    }
+//
+//    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+//        View item;
+//        TextView algebraTitle;
+//
+//        public ViewHolder(View itemView) {
+//            super(itemView);
+//            item = itemView;
+//            algebraTitle = itemView.findViewById(R.id.algebraTitle);
+//        }
+//
+//        @Override
+//        public void onClick(View view) {
+//
+//        }
+//    }
 }

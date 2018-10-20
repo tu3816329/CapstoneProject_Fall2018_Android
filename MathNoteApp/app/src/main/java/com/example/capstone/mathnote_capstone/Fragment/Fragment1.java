@@ -1,4 +1,4 @@
-package com.example.capstone.mathnote_capstone.Fragment;
+package com.example.capstone.mathnote_capstone.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

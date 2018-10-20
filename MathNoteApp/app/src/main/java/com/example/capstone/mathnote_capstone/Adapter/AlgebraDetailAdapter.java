@@ -1,13 +1,21 @@
-package com.example.capstone.mathnote_capstone.Adapter;
+package com.example.capstone.mathnote_capstone.adapter;
 
-import android.net.Uri;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.capstone.mathnote_capstone.R;
+import com.example.capstone.mathnote_capstone.activity.WebviewActivity;
+import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
+import com.example.capstone.mathnote_capstone.model.Lesson;
+import com.example.capstone.mathnote_capstone.utils.AppUtils;
 import com.github.florent37.expansionpanel.ExpansionLayout;
 import com.github.florent37.expansionpanel.viewgroup.ExpansionLayoutCollection;
 
@@ -18,14 +26,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDetailAdapter.RecyclerHolder> {
-    private static WebView myWebView;
-    private final List<Object> list = new ArrayList<>();
+    private static WebView webView;
+    private static TextView lessonTitleTv;
+    private final List<Lesson> lessons = new ArrayList<>();
 
+    private Context context;
     private final ExpansionLayoutCollection expansionsCollection = new ExpansionLayoutCollection();
 
-    public AlgebraDetailAdapter() {
+    public AlgebraDetailAdapter(Context context) {
         expansionsCollection.openOnlyOne(false);
-
+        this.context = context;
     }
 
     @Override
@@ -34,48 +44,90 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
     }
 
     @Override
-    public void onBindViewHolder(AlgebraDetailAdapter.RecyclerHolder holder, int position) {
-        holder.bind(list.get(position));
+    public void onBindViewHolder(AlgebraDetailAdapter.RecyclerHolder holder, final int position) {
+        final int lessonId = lessons.get(position).getId();
+        final String lessonTitle = lessons.get(position).getLessonTitle();
+        final String lessonContent = lessons.get(position).getLessonContent();
 
+        holder.bind(lessons.get(position));
         expansionsCollection.add(holder.getExpansionLayout());
+        lessonTitleTv.setText(lessonTitle);
+        String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
+        webView.loadDataWithBaseURL(null, data, "text/html",
+                "utf-8", "");
+        webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
 
+        holder.lessonDetailIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, WebviewActivity.class);
+                intent.putExtra("lessonid", lessonId);
+                intent.putExtra("lessontitle", lessonTitle);
+                intent.putExtra("lessoncontent", lessonContent);
+                context.startActivity(intent);
+            }
+        });
+
+        // Set favorite icon
+        final MathFormulasDao dao = new MathFormulasDao(context);
+        final boolean isFavorite = lessons.get(position).isFavorite();
+        if (isFavorite) {
+            holder.favoriteIv.setBackgroundResource(R.drawable.ic_favorites_white);
+        }
+        // Click favorite icon
+        holder.favoriteIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean isFavorite = dao.isFavoriteLesson(lessonId);
+                if(isFavorite) {
+                    dao.removeFavoriteLesson(lessonId);
+                    view.setBackgroundResource(R.drawable.ic_favorite_border_white);
+                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                } else {
+                    dao.addFavoriteLesson(lessonId);
+                    view.setBackgroundResource(R.drawable.ic_favorites_white);
+                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return lessons.size();
     }
 
-    public void setItems(List<Object> items) {
-        this.list.addAll(items);
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons.addAll(lessons);
         notifyDataSetChanged();
     }
 
     public final static class RecyclerHolder extends RecyclerView.ViewHolder {
 
         private static final int LAYOUT = R.layout.list_detail_algebra_item;
+        private ImageView lessonDetailIv;
+        private ImageView favoriteIv;
 
         @BindView(R.id.expansionLayout)
         ExpansionLayout expansionLayout;
 
-        public static AlgebraDetailAdapter.RecyclerHolder buildFor(ViewGroup viewGroup) {
+        private static AlgebraDetailAdapter.RecyclerHolder buildFor(ViewGroup viewGroup) {
             return new AlgebraDetailAdapter.RecyclerHolder(LayoutInflater.from(viewGroup.getContext()).inflate(LAYOUT, viewGroup, false));
         }
 
-        public RecyclerHolder(View itemView) {
+        private RecyclerHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            myWebView = itemView.findViewById(R.id.webview1);
-            myWebView.getSettings().setJavaScriptEnabled(true);
-            final String path = Uri.parse("file:///android_asset/index.html").toString();
-
-            myWebView.loadUrl(path);
-
-
+            lessonTitleTv = itemView.findViewById(R.id.tvLessonTitle);
+            lessonDetailIv = itemView.findViewById(R.id.ivViewDetail);
+            favoriteIv = itemView.findViewById(R.id.ivFavorite);
+            webView = itemView.findViewById(R.id.webview1);
+            webView.getSettings().setLoadsImagesAutomatically(true);
+            webView.getSettings().setJavaScriptEnabled(true);
         }
 
-        public void bind(Object object) {
+        private void bind(Object object) {
             expansionLayout.collapse(false);
         }
 

@@ -1,4 +1,4 @@
-package com.example.capstone.mathnote_capstone.Activity;
+package com.example.capstone.mathnote_capstone.activity;
 
 import android.content.Intent;
 import android.support.v4.view.ViewPager;
@@ -10,30 +10,26 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.capstone.mathnote_capstone.Adapter.SliderAdapter;
+import com.example.capstone.mathnote_capstone.adapter.SliderAdapter;
 import com.example.capstone.mathnote_capstone.R;
 
 public class InstructionActivity extends AppCompatActivity {
     private ViewPager mSliderViewPager;
     private LinearLayout mDotLayout;
-    private TextView[] mDots;
 
     private SliderAdapter sliderAdapter;
-    private Button btnSkip;
-    private Button btnNext;
     private int mCurrentSlide;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instruction);
 
-        mSliderViewPager = (ViewPager) findViewById(R.id.slideViewPager);
-        mDotLayout = (LinearLayout) findViewById(R.id.dotsLayout);
+        mSliderViewPager = findViewById(R.id.slideViewPager);
+        mDotLayout = findViewById(R.id.dotsLayout);
 
-        btnNext = (Button) findViewById(R.id.btnNext);
-        btnSkip = (Button) findViewById(R.id.btnSkip);
+        Button btnNext = findViewById(R.id.btnNext);
+        Button btnSkip = findViewById(R.id.btnSkip);
 
         sliderAdapter = new SliderAdapter(this);
         mSliderViewPager.setAdapter(sliderAdapter);
@@ -49,15 +45,15 @@ public class InstructionActivity extends AppCompatActivity {
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(InstructionActivity.this, GradeActivity.class);
-                startActivity(i);
+                Intent intent = new Intent(InstructionActivity.this, GradeActivity.class);
+                startActivity(intent);
                 finish();
             }
         });
     }
 
     public void addDotsIndicator(int position) {
-        mDots = new TextView[sliderAdapter.slide_images.length];
+        TextView[] mDots = new TextView[sliderAdapter.slide_images.length];
         mDotLayout.removeAllViews();
         for (int i = 0; i < mDots.length; i++) {
             mDots[i] = new TextView(this);

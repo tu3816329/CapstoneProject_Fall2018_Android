@@ -1,4 +1,4 @@
-package com.example.capstone.mathnote_capstone.Adapter;
+package com.example.capstone.mathnote_capstone.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,22 +9,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 
-import com.example.capstone.mathnote_capstone.Activity.MainActivity;
-import com.example.capstone.mathnote_capstone.Model.Grade;
+import com.example.capstone.mathnote_capstone.activity.MainActivity;
+import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.R;
 
 public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapterHolder> {
     private Context mContext;
     private LayoutInflater mLayoutInflater;
-    private ArrayList<Grade> grades;
+    private List<Grade> grades;
 
 
-    public GradeAdapter(Context mContext, ArrayList<Grade> grades) {
+    public GradeAdapter(Context mContext, List<Grade> grades) {
         this.mContext = mContext;
         this.grades = grades;
         mLayoutInflater = LayoutInflater.from(mContext);
@@ -38,12 +37,14 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapter
 
     @Override
     public void onBindViewHolder(GradeAdapterHolder holder, int position) {
-        Grade grade = grades.get(position);
+        final Grade grade = grades.get(position);
         holder.setDetails(grade);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, MainActivity.class);
+                intent.putExtra("gradeid", grade.getId());
+                intent.putExtra("gradename", grade.getGradeName());
                 mContext.startActivity(intent);
             }
         });
@@ -57,24 +58,23 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapter
 
     public class GradeAdapterHolder extends RecyclerView.ViewHolder {
         private ImageView imageView;
-        private TextView txtGrade, txtNumberOfChapter;
+        private TextView txtGradeName, txtNumOfChapters;
 
 
         public GradeAdapterHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.ivImg);
-            txtGrade = (TextView) itemView.findViewById(R.id.txtGrade);
-            txtNumberOfChapter = (TextView) itemView.findViewById(R.id.txtNumberOfChapter);
+            txtGradeName = (TextView) itemView.findViewById(R.id.txtGrade);
+            txtNumOfChapters = (TextView) itemView.findViewById(R.id.txtNumberOfChapter);
         }
 
         public void setDetails(Grade grade) {
-            imageView.setImageResource(Integer.parseInt(grade.getImg()));
-            txtGrade.setText(grade.getGradeName());
-            txtNumberOfChapter.setText(String.format("%d chapters", grade.getNumberOfChapter()));
+            imageView.setImageResource(R.drawable.img000);
+            txtGradeName.setText(grade.getGradeName());
+            txtNumOfChapters.setText(String.format("%d chapters", grade.getNumOfChapters()));
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
 
                 }
             });
