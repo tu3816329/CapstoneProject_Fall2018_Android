@@ -3,9 +3,10 @@ package com.example.capstone.mathnote_capstone.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ResponseData {
+public class ResponseData implements Serializable {
 
     @Expose
     @SerializedName("grades")

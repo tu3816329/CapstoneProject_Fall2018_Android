@@ -11,9 +11,8 @@ import java.util.Date;
 public class AppUtils {
 
     public static final String MATHJAX1 = "<html><head>" +
-            " <meta name=\"viewport\" content=\"width=device-width, user-scalable=yes\" />" +
-            "</head>" +
-            "" +
+            " <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=yes\" />" +
+            "<style>img{width:\" + width + \"px; max-width: 100%}</style></head>" +
             "<body style=\"font-size:18px\" >";
     public static final String MATHJAX2 = "<script type=\"text/x-mathjax-config\">" +
             "  MathJax.Hub.Config({\n" +
@@ -30,7 +29,8 @@ public class AppUtils {
             "" +
             "</body>" +
             "</html>";
-    private static Boolean firstTime = null;
+    public static final String[] alphas = new String[]{"A. ","B. ","C. ","D. "};
+    public static Boolean firstTime = null;
 
     public static boolean isFirstUsed(Context context) {
         if(firstTime == null) {

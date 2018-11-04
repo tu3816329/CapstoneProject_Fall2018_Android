@@ -3,7 +3,9 @@ package com.example.capstone.mathnote_capstone.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class QuestionChoice {
+import java.io.Serializable;
+
+public class QuestionChoice implements Serializable {
 
     @Expose
     @SerializedName("id")
@@ -27,12 +29,11 @@ public class QuestionChoice {
 
     public QuestionChoice() {}
 
-    public QuestionChoice(int id, String content, boolean isCorrect, Question question, Version version) {
+    public QuestionChoice(int id, String content, boolean isCorrect, Question question) {
         this.id = id;
         this.content = content;
         this.isCorrect = isCorrect;
         this.question = question;
-        this.version = version;
     }
 
     public int getId() {

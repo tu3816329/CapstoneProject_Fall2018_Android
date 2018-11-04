@@ -1,9 +1,12 @@
 package com.example.capstone.mathnote_capstone.activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
@@ -16,19 +19,35 @@ import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.UserNote;
 import com.example.capstone.mathnote_capstone.remote.APIUtils;
+import com.example.capstone.mathnote_capstone.utils.AppUtils;
 
 public class UserNoteActivity extends AppCompatActivity {
 
     WebView webView = null;
-    Button button = null;
+    Button saveBtn;
     EditText noteTitleEt;
+
+    private UserNote note = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Thêm ghi chú");
+        //
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            note = (UserNote) bundle.getSerializable("usernote");
+            actionBar.setTitle("Sửa ghi chú");
+        }
+        //
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left);
         setContentView(R.layout.activity_user_note);
+
         noteTitleEt = findViewById(R.id.note_title_et);
         webView = findViewById(R.id.output);
+        saveBtn = findViewById(R.id.save_btn);
 
         webView.setWebViewClient(new MyBrowser());
         webView.getSettings().setDefaultTextEncodingName("utf-8");
@@ -39,14 +58,27 @@ public class UserNoteActivity extends AppCompatActivity {
         webView.addJavascriptInterface(new WebJsInterface(), "Android");
         webView.loadUrl(APIUtils.API_URL + "math-editor");
 
-        button = findViewById(R.id.save_btn);
-        button.setOnClickListener(new View.OnClickListener() {
+        if (note != null) {
+            noteTitleEt.setText(note.getTitle());
+        }
+        saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                webView.evaluateJavascript("document.getElementById('btn-save').click();", null);
-//                webView.loadUrl("javascript:document.getElementById('btn-save').click()");
+                webView.evaluateJavascript(
+                        "document.getElementById('btn-save').click();", null
+                );
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                setResult(Activity.RESULT_OK);
+                finish();
+        }
+        return true;
     }
 
     private class MyBrowser extends WebViewClient {
@@ -54,6 +86,16 @@ public class UserNoteActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            if(note != null) {
+                webView.evaluateJavascript(
+                        "editor.setMathML('" + note.getContent() + "');", null
+                );
+            }
         }
     }
 
@@ -68,16 +110,39 @@ public class UserNoteActivity extends AppCompatActivity {
             MathFormulasDao dao = new MathFormulasDao(UserNoteActivity.this);
             String content = d.trim();
             if (!title.isEmpty()) {
-                UserNote userNote = new UserNote(0, title, content);
-                dao.saveUserNote(userNote);
-                Toast.makeText(UserNoteActivity.this,
-                        "Đã thêm ghi chú", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(UserNoteActivity.this, MainActivity.class);
-                startActivity(intent);
+                if (note == null) {
+                    UserNote userNote = new UserNote(0, title, content, AppUtils.getCurrentDateTime());
+                    long id = dao.saveUserNote(userNote);
+                    if (id > 0) {
+//                        note = null;
+                        Toast.makeText(UserNoteActivity.this,
+                                "Đã thêm ghi chú", Toast.LENGTH_SHORT).show();
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+                    }
+                } else {
+                    UserNote userNote = new UserNote(note.getId(), title, content, AppUtils.getCurrentDateTime());
+                    int row = dao.editUserNote(userNote);
+                    if (row > 0) {
+//                        note = null;
+                        Toast.makeText(UserNoteActivity.this,
+                                "Đã lưu thay đổi", Toast.LENGTH_SHORT).show();
+                        setResult(Activity.RESULT_OK);
+                        finish();
+                        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+                    }
+                }
             } else {
                 Toast.makeText(UserNoteActivity.this,
                         "Xin vui lòng nhập tiêu đề", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_OK);
+        finish();
     }
 }

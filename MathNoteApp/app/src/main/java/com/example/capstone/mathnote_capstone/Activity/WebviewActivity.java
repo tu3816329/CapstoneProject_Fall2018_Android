@@ -1,7 +1,10 @@
 package com.example.capstone.mathnote_capstone.activity;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.webkit.WebView;
@@ -11,8 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.mathnote_capstone.R;
+import com.example.capstone.mathnote_capstone.adapter.MathformListAdapter;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.Exercise;
+import com.example.capstone.mathnote_capstone.model.Lesson;
 import com.example.capstone.mathnote_capstone.model.Mathform;
 import com.example.capstone.mathnote_capstone.utils.AppUtils;
 
@@ -31,74 +36,71 @@ public class WebviewActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // Lesson info
-        final int lessonId = Objects.requireNonNull(getIntent().getExtras()).getInt("lessonid");
-        String lessonContent = getIntent().getExtras().getString("lessoncontent");
+        final Lesson lesson = (Lesson) getIntent().getExtras().getSerializable("lesson");
+        String activity = getIntent().getExtras().getString("activity", "");
+        final ImageView favoriteIv = findViewById(R.id.favorite_iv2);
+        if(activity.equals("favorite")) {
+            favoriteIv.setVisibility(View.INVISIBLE);
+        }
         TextView titleTv = findViewById(R.id.webview_title_tv);
-        titleTv.setText(Objects.requireNonNull(getIntent().getExtras()).getString("lessontitle"));
+        titleTv.setText(lesson.getLessonTitle());
         // Favorite icon
         final MathFormulasDao dao = new MathFormulasDao(this);
-        final ImageView favoriteIv = findViewById(R.id.favorite_iv2);
 
-        boolean isFavorite = dao.isFavoriteLesson(lessonId);
+        boolean isFavorite = dao.isFavoriteLesson(lesson.getId());
         if (isFavorite) {
-            favoriteIv.setBackgroundResource(R.drawable.ic_favorites_white);
+            favoriteIv.setBackgroundResource(R.drawable.ic_heart_white);
         }
         favoriteIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean isFavorite = dao.isFavoriteLesson(lessonId);
+                boolean isFavorite = dao.isFavoriteLesson(lesson.getId());
                 if (isFavorite) {
-                    dao.removeFavoriteLesson(lessonId);
+                    dao.removeFavoriteLesson(lesson.getId());
                     view.setBackgroundResource(R.drawable.ic_favorite_border_white);
                     Toast.makeText(WebviewActivity.this, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
                 } else {
-                    dao.addFavoriteLesson(lessonId);
-                    view.setBackgroundResource(R.drawable.ic_favorites_white);
+                    dao.addFavoriteLesson(lesson.getId());
+                    view.setBackgroundResource(R.drawable.ic_heart_white);
                     Toast.makeText(WebviewActivity.this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        // Webview configuration
+        // Mathform recyclerview
+        RecyclerView mathformRv = findViewById(R.id.mathform_rv);
+        mathformRv.setLayoutManager(new LinearLayoutManager(this));
+        List<Mathform> mathforms = dao.getMathformByLesson(lesson.getId());
+        MathformListAdapter adapter = new MathformListAdapter(this, mathforms);
+        mathformRv.setAdapter(adapter);
+
+        // WebView configuration
         WebView webView = findViewById(R.id.webview);
         webView.setWebViewClient(new MyBrowser());
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+//        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setDisplayZoomControls(false);
 
         // Get mathforms
-        List<Mathform> mathforms = dao.getMathformByLesson(lessonId);
-        StringBuilder data = new StringBuilder(AppUtils.MATHJAX1 + lessonContent + "<hr>");
-        data.append("<h4 style=\"text-align: center\">Các dạng bài</h5>");
-        int mfCount = 1;
-        for (Mathform mathform : mathforms) {
-            data.append("<h5 style=\"text-decoration: underline\">")
-                    .append(mfCount++)
-                    .append("/ ")
-                    .append(mathform.getMathformTitle())
-                    .append("</h5>")
-                    .append(mathform.getMathformContent());
-            // Get exercises
-            List<Exercise> exercises = dao.getExercisesByMathform(mathform.getId());
-            int exCount = 1;
-            for (Exercise exercise : exercises) {
-                data.append("<span style=\"font-weight: bold\">Bài ")
-                        .append(exCount++).append(": </span>")
-                        .append(exercise.getTopic());
-                data.append("Đáp án: ")
-                        .append(exercise.getAnswer())
-                        .append("<br>");
-            }
-        }
-        // End of data
-        data.append(AppUtils.MATHJAX2);
+        String data = AppUtils.MATHJAX1 + lesson.getLessonContent() + AppUtils.MATHJAX2;
         webView.loadDataWithBaseURL(null, data.toString(), "text/html", "utf-8", "");
         webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+        setResult(Activity.RESULT_OK);
+        finish();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_OK);
+        finish();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 
     private class MyBrowser extends WebViewClient {

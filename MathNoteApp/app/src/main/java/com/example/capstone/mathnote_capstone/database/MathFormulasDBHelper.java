@@ -37,23 +37,20 @@ public class MathFormulasDBHelper extends SQLiteOpenHelper {
     private void copyDatabase() throws IOException {
         InputStream is = context.getAssets().open(DATABASE_NAME);
         File dir = new File(DATABASE_PATH);
-        boolean isCreatedPath = false;
         if (!dir.exists()) {
-            isCreatedPath = dir.mkdirs();
+             dir.mkdirs();
         }
-        if (isCreatedPath) {
-            String outputFile = DATABASE_PATH + DATABASE_NAME;
-            OutputStream os = new FileOutputStream(outputFile);
+        String outputFile = DATABASE_PATH + DATABASE_NAME;
+        OutputStream os = new FileOutputStream(outputFile);
 
-            byte[] buffer = new byte[10];
-            int length;
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
-            }
-            os.flush();
-            os.close();
-            is.close();
+        byte[] buffer = new byte[10];
+        int length;
+        while ((length = is.read(buffer)) > 0) {
+            os.write(buffer, 0, length);
         }
+        os.flush();
+        os.close();
+        is.close();
     }
 
     private boolean checkDatabase() {

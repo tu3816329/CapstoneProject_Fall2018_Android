@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@color/colorWhite">
+
+    <com.chauthai.swipereveallayout.SwipeRevealLayout
+        android:id="@+id/lesson_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dragEdge="right"
+        app:mode="same_level">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/remove_favorite_ib"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/holo_red_dark"
+                    android:src="@drawable/ic_action_delete" />
+
+                <ImageButton
+                    android:id="@+id/lesson_detail_ib2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorGreen"
+                    android:src="@drawable/ic_eye_white" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/lesson_item_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite"
+            android:orientation="horizontal"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:id="@+id/lesson_title_tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/lesson_score_container"
+                android:fontFamily="@font/play_regular"
+                android:text="Formulas Category"
+                android:textColor="@color/darkGray"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/mathforms_num2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lesson_title_tv2"
+                android:layout_marginTop="5dp"
+                android:text="5 dạng bài"
+                android:textColor="@color/darkGray" />
+
+            <FrameLayout
+                android:id="@+id/lesson_score_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true">
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:progress="100"
+                    android:progressDrawable="@drawable/custom_progress_bg" />
+
+                <ProgressBar
+                    android:id="@+id/lesson_score_pb2"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:progress="50"
+                    android:progressDrawable="@drawable/custom_progress" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/lesson_score_tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/lesson_score_container"
+                android:layout_alignTop="@+id/lesson_score_container"
+                android:layout_alignRight="@+id/lesson_score_container"
+                android:layout_alignBottom="@+id/lesson_score_container"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:text="100"
+                android:textAlignment="center"
+                android:textColor="@color/darkGray" />
+
+        </RelativeLayout>
+    </com.chauthai.swipereveallayout.SwipeRevealLayout>
+
+</RelativeLayout>

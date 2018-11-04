@@ -1,5 +1,6 @@
 package com.example.capstone.mathnote_capstone.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,53 +15,60 @@ import com.example.capstone.mathnote_capstone.adapter.SliderAdapter;
 import com.example.capstone.mathnote_capstone.R;
 
 public class InstructionActivity extends AppCompatActivity {
-    private ViewPager mSliderViewPager;
-    private LinearLayout mDotLayout;
+    private ViewPager sliderViewPager;
+    private LinearLayout dotLayout;
 
     private SliderAdapter sliderAdapter;
-    private int mCurrentSlide;
+    private int currentSlide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_instruction);
 
-        mSliderViewPager = findViewById(R.id.slideViewPager);
-        mDotLayout = findViewById(R.id.dotsLayout);
+        sliderViewPager = findViewById(R.id.slideViewPager);
+        dotLayout = findViewById(R.id.dotsLayout);
 
         Button btnNext = findViewById(R.id.btnNext);
         Button btnSkip = findViewById(R.id.btnSkip);
 
         sliderAdapter = new SliderAdapter(this);
-        mSliderViewPager.setAdapter(sliderAdapter);
+        sliderViewPager.setAdapter(sliderAdapter);
         addDotsIndicator(0);
-        mSliderViewPager.addOnPageChangeListener(viewListener);
+        sliderViewPager.addOnPageChangeListener(viewListener);
 
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSliderViewPager.setCurrentItem(mCurrentSlide + 1);
+                sliderViewPager.setCurrentItem(currentSlide + 1);
             }
         });
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(InstructionActivity.this, GradeActivity.class);
-                startActivity(intent);
-                finish();
+                String previousActivity = getIntent().getStringExtra("activity");
+                if (previousActivity.equals("progress")) {
+                    Intent intent = new Intent(InstructionActivity.this, GradeActivity.class);
+                    intent.putExtra("activity", "instruction");
+                    startActivity(intent);
+                } else if (previousActivity.equals("main")) {
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                }
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
     }
 
     public void addDotsIndicator(int position) {
         TextView[] mDots = new TextView[sliderAdapter.slide_images.length];
-        mDotLayout.removeAllViews();
+        dotLayout.removeAllViews();
         for (int i = 0; i < mDots.length; i++) {
             mDots[i] = new TextView(this);
             mDots[i].setText(Html.fromHtml("&#8226;"));
             mDots[i].setTextSize(35);
             mDots[i].setTextColor(getResources().getColor(R.color.colorTransparentWhite));
-            mDotLayout.addView(mDots[i]);
+            dotLayout.addView(mDots[i]);
         }
         if (mDots.length > 0) {
             mDots[position].setTextColor(getResources().getColor(R.color.colorPrimaryLight));
@@ -77,7 +85,7 @@ public class InstructionActivity extends AppCompatActivity {
         public void onPageSelected(int position) {
             addDotsIndicator(position);
 
-            mCurrentSlide = position;
+            currentSlide = position;
 //            if (position==0){
 //                btnNext.setEnabled(true);
 //            }
@@ -89,4 +97,7 @@ public class InstructionActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onBackPressed() {
+    }
 }

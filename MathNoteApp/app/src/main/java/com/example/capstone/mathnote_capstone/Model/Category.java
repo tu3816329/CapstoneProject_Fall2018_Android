@@ -31,6 +31,8 @@ public class Category implements Serializable {
     @Expose
     private Version version;
 
+    private float progress;
+
     public Category() {
     }
 
@@ -87,6 +89,14 @@ public class Category implements Serializable {
 
     public void setVersion(Version version) {
         this.version = version;
+    }
+
+    public float getProgress() {
+        return progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
     }
 
     @Override

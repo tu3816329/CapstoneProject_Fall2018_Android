@@ -3,7 +3,9 @@ package com.example.capstone.mathnote_capstone.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Mathform {
+import java.io.Serializable;
+
+public class Mathform implements Serializable {
 
     @SerializedName("id")
     @Expose

@@ -16,7 +16,9 @@ import com.example.capstone.mathnote_capstone.model.Mathform;
 import com.example.capstone.mathnote_capstone.model.Question;
 import com.example.capstone.mathnote_capstone.model.QuestionChoice;
 import com.example.capstone.mathnote_capstone.model.QuestionLevel;
+import com.example.capstone.mathnote_capstone.model.Quiz;
 import com.example.capstone.mathnote_capstone.model.ResponseData;
+import com.example.capstone.mathnote_capstone.model.UserChoice;
 import com.example.capstone.mathnote_capstone.model.UserNote;
 import com.example.capstone.mathnote_capstone.model.Version;
 import com.example.capstone.mathnote_capstone.utils.AppUtils;
@@ -32,18 +34,20 @@ public class MathFormulasDao {
         this.dbHelper = new MathFormulasDBHelper(context);
     }
 
-    public void saveUserNote(UserNote userNote) {
+    public void resetQuizByLesson(int lessonId) {
         SQLiteDatabase wdb = null;
-
         try {
             wdb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(MathFormulasContract.COLUMN_ID, userNote.getId());
-            values.put(MathFormulasContract.UserNoteEntry.COLUMN_TITLE, userNote.getTitle());
-            values.put(MathFormulasContract.UserNoteEntry.COLUMN_CONTENT, userNote.getContent());
-            wdb.insert(MathFormulasContract.UserNoteEntry.TABLE_NAME, null, values);
+            values.put(MathFormulasContract.QuestionEntry.COLUMN_IS_ANSWERED, false);
+            wdb.update(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, values,
+                    MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID + " = ?",
+                    new String[]{lessonId + ""}
+            );
+            removeUserChoiceByLesson(lessonId);
         } catch (SQLiteException e) {
-            Log.i("Dao_saveUserNote", e.getLocalizedMessage());
+            Log.i("Dao_resetQuestionStatus", e.getLocalizedMessage());
         } finally {
             if (wdb != null) {
                 wdb.close();
@@ -51,14 +55,547 @@ public class MathFormulasDao {
         }
     }
 
-    public void removeUserNote(int userNoteId) {
+    public void setQuestionStatus(int questionId) {
         SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.QuestionEntry.COLUMN_IS_ANSWERED, true);
+            wdb.update(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{questionId + ""}
+            );
+        } catch (SQLiteException e) {
+            Log.i("Dao_setQuestionStatus", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    public void resetQuizByCategory(int categoryId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FINISHED, false);
+            int row = wdb.update(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, values,
+                    MathFormulasContract.LessonEntry.COLUMN_CATEGORY_ID + " = ?",
+                    new String[]{categoryId + ""}
+            );
+            resetQuestionsByCategory(categoryId);
+            removeUserChoiceByCategory(categoryId);
+        } catch (SQLiteException e) {
+            Log.i("Dao_resetLesson", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    private void removeUserChoiceByLesson(int lessonId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            List<Quiz> questions = getUnansweredQuestion(lessonId);
+            for (Quiz q : questions) {
+                wdb.delete(
+                        MathFormulasContract.UserChoiceEntry.TABLE_NAME,
+                        MathFormulasContract.UserChoiceEntry.COLUMN_QUESTION_ID + " = ?",
+                        new String[]{q.getQuestion().getId() + ""}
+                );
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_removeChoiceLesson", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    private void removeUserChoiceByCategory(int categoryId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            List<Lesson> lessons = getLessonsByCategory(categoryId);
+            for (Lesson lesson : lessons) {
+                List<Quiz> quizzes = getUnansweredQuestion(lesson.getId());
+                for (Quiz q : quizzes) {
+                    wdb.delete(
+                            MathFormulasContract.UserChoiceEntry.TABLE_NAME,
+                            MathFormulasContract.UserChoiceEntry.COLUMN_QUESTION_ID + " = ?",
+                            new String[]{q.getQuestion().getId() + ""}
+                    );
+                }
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_removeChoiceCate", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    private void resetQuestionsByCategory(int categoryId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            List<Lesson> lessons = getLessonsByCategory(categoryId);
+            for (Lesson lesson : lessons) {
+                ContentValues values = new ContentValues();
+                values.put(MathFormulasContract.QuestionEntry.COLUMN_IS_ANSWERED, false);
+                int row = wdb.update(
+                        MathFormulasContract.QuestionEntry.TABLE_NAME, values,
+                        MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID + " = ?",
+                        new String[]{lesson.getId() + ""}
+                );
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_resetQuesByCate", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    public void saveUserChoice(int questionId, int choiceId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.UserChoiceEntry.COLUMN_QUESTION_ID, questionId);
+            values.put(MathFormulasContract.UserChoiceEntry.COLUMN_CHOICE_ID, choiceId);
+            wdb.insert(MathFormulasContract.UserChoiceEntry.TABLE_NAME, null, values);
+        } catch (SQLiteException e) {
+            Log.i("Dao_resetLesson", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    public List<Question> getQuestionsByLesson(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<Question> questions = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, null,
+                    MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID + " = ?",
+                    new String[]{lessonId + ""}, null, null, null
+            );
+            Lesson lesson = getLessonById(lessonId);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Question question = new Question(cursor.getInt(0), cursor.getString(1), lesson);
+                    question.setAnswered(cursor.getInt(4) > 0);
+                    questions.add(question);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_nextQuiz", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return questions;
+    }
+
+    public List<UserChoice> getUserChoicesByLesson(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<UserChoice> userChoices = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            Lesson lesson = getLessonById(lessonId);
+            List<Question> questions = getQuestionsByLesson(lessonId);
+            for (Question question : questions) {
+                cursor = rdb.query(
+                        MathFormulasContract.UserChoiceEntry.TABLE_NAME, null,
+                        MathFormulasContract.UserChoiceEntry.COLUMN_QUESTION_ID + " = ?",
+                        new String[]{question.getId() + ""}, null, null, null
+                );
+                if (cursor != null && cursor.moveToFirst()) {
+                    QuestionChoice choice = getQuestionChoiceById(cursor.getInt(2));
+                    UserChoice userChoice = new UserChoice(cursor.getInt(0), question, choice);
+                    userChoices.add(userChoice);
+                }
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getUserChoicesByLes", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return userChoices;
+    }
+
+    private int countFinishedLesson(int categoryId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, null,
+                    MathFormulasContract.LessonEntry.COLUMN_IS_FINISHED + " = 1 AND " +
+                            MathFormulasContract.LessonEntry.COLUMN_CATEGORY_ID + " = ?",
+                    new String[]{categoryId + ""}, null, null, null
+            );
+            return cursor.getCount();
+        } catch (SQLiteException e) {
+            Log.i("Dao_nextQuiz", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return 0;
+    }
+
+    public void updateCategoryProgress(int categoryId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            int progress = countFinishedLesson(categoryId) * 100 / getLessonsByCategory(categoryId).size();
+            values.put(MathFormulasContract.CategoryEntry.COLUMN_PROGRESS, progress);
+            wdb.update(
+                    MathFormulasContract.CategoryEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{categoryId + ""}
+            );
+        } catch (SQLiteException e) {
+            Log.i("Dao_updateProgress", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    public void setLessonFinish(int lessonId) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FINISHED, true);
+            wdb.update(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
+            );
+        } catch (SQLiteException e) {
+            Log.i("Dao_nextQuiz", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    /**
+     * Return next lesson id which has not been finished
+     **/
+    public int getNextQuizId(int categoryId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, null,
+                    MathFormulasContract.LessonEntry.COLUMN_IS_FINISHED + " = ? AND " +
+                            MathFormulasContract.LessonEntry.COLUMN_CATEGORY_ID + " = ?",
+                    new String[]{"0", categoryId + ""}, null, null, "id ASC", "1"
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(0);
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_nextQuiz", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return 0;
+    }
+
+    public Question getQuestionById(int questionId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, null,
+                    MathFormulasContract.COLUMN_ID + " = ?",
+                    new String[]{questionId + ""}, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                Lesson lesson = getLessonById(cursor.getInt(2));
+                Question question = new Question(cursor.getInt(0), cursor.getString(1), lesson);
+                return question;
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getQuestionById", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return null;
+    }
+
+    public int getQuizScore(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<Quiz> quizzes = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, null,
+                    MathFormulasContract.COLUMN_ID + " = ?",
+                    new String[]{lessonId + ""}, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(7);
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_isFavoriteLesson", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return -1;
+    }
+
+    public void saveQuizScore(int lessonId, int score) {
+        SQLiteDatabase wdb = null;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.LessonEntry.COLUMN_SCORE, score);
+            wdb.update(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
+            );
+        } catch (SQLiteException e) {
+            Log.i("Dao_saveQuizScore", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+    }
+
+    /**
+     * Check if the user has not finished the previous quiz
+     **/
+    public boolean isQuizOnGoing(int lessonId) {
+        try {
+            int unansweredCount = getUnansweredQuestion(lessonId).size();
+            int allQuestionCount = countQuestionsByLesson(lessonId);
+            return unansweredCount != allQuestionCount;
+        } catch (SQLiteException e) {
+            Log.i("Dao_isQuizOnGoing", e.getLocalizedMessage());
+        }
+        return false;
+    }
+
+    public int countQuestionsByLesson(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, null,
+                    MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID + " = ?",
+                    new String[]{lessonId + ""}, null, null, null
+            );
+            return cursor.getCount();
+        } catch (SQLiteException e) {
+            Log.i("Dao_countQuesByLesson", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Get all question has not been answered in a lesson
+     **/
+    public List<Quiz> getUnansweredQuestion(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<Quiz> quizzes = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionEntry.TABLE_NAME, null,
+                    MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID + " = ? AND " +
+                            MathFormulasContract.QuestionEntry.COLUMN_IS_ANSWERED + " = ?",
+                    new String[]{lessonId + "", "0"}, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Lesson lesson = getLessonById(lessonId);
+                    Question question = new Question(cursor.getInt(0), cursor.getString(1), lesson);
+                    List<QuestionChoice> choices = getQuestionChoices(question);
+                    Quiz quiz = new Quiz(question, choices);
+                    quizzes.add(quiz);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getUnanswerQuestion", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return quizzes;
+    }
+
+    public QuestionChoice getQuestionChoiceById(int choiceId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        QuestionChoice choice = null;
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionChoiceEntry.TABLE_NAME, null,
+                    MathFormulasContract.COLUMN_ID + " = ?",
+                    new String[]{choiceId + ""}, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                choice = new QuestionChoice(
+                        cursor.getInt(0), cursor.getString(1), cursor.getInt(2) > 0, null
+                );
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getChoiceById", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return choice;
+    }
+
+    public List<QuestionChoice> getQuestionChoices(Question question) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<QuestionChoice> choices = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.QuestionChoiceEntry.TABLE_NAME, null,
+                    MathFormulasContract.QuestionChoiceEntry.COLUMN_QUESTION_ID + " = ?",
+                    new String[]{question.getId() + ""}, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = 0;
+                do {
+                    QuestionChoice choice = new QuestionChoice(
+                            cursor.getInt(0), cursor.getString(1), cursor.getInt(2) > 0,
+                            question
+                    );
+                    choices.add(choice);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_isFavoriteLesson", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return choices;
+    }
+
+    public List<UserNote> getAllNotes() {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<UserNote> notes = new ArrayList<>();
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.UserNoteEntry.TABLE_NAME, null,
+                    null, null, null, null, null
+            );
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    UserNote note = new UserNote(
+                            cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3)
+                    );
+                    notes.add(note);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_isFavoriteLesson", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return notes;
+    }
+
+    public int editUserNote(UserNote userNote) {
+        SQLiteDatabase wdb = null;
+        int row = 0;
 
         try {
-            wdb.delete(
-                    MathFormulasContract.UserNoteEntry.TABLE_NAME,
-                    MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[] {userNoteId + ""}
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_TITLE, userNote.getTitle());
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_CONTENT, userNote.getContent());
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_DATE, userNote.getDate());
+            row = wdb.update(
+                    MathFormulasContract.UserNoteEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{userNote.getId() + ""}
             );
         } catch (SQLiteException e) {
             Log.i("Dao_saveUserNote", e.getLocalizedMessage());
@@ -67,6 +604,48 @@ public class MathFormulasDao {
                 wdb.close();
             }
         }
+        return row;
+    }
+
+    public long saveUserNote(UserNote userNote) {
+        SQLiteDatabase wdb = null;
+        long row = 0;
+
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_TITLE, userNote.getTitle());
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_CONTENT, userNote.getContent());
+            values.put(MathFormulasContract.UserNoteEntry.COLUMN_DATE, userNote.getDate());
+            row = wdb.insert(MathFormulasContract.UserNoteEntry.TABLE_NAME, null, values);
+        } catch (SQLiteException e) {
+            Log.i("Dao_saveUserNote", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+        return row;
+    }
+
+    public int removeUserNote(int userNoteId) {
+        SQLiteDatabase wdb = null;
+        int row = 0;
+        try {
+            wdb = dbHelper.getWritableDatabase();
+            row = wdb.delete(
+                    MathFormulasContract.UserNoteEntry.TABLE_NAME,
+                    MathFormulasContract.COLUMN_ID + " = ?",
+                    new String[]{userNoteId + ""}
+            );
+        } catch (SQLiteException e) {
+            Log.i("Dao_saveUserNote", e.getLocalizedMessage());
+        } finally {
+            if (wdb != null) {
+                wdb.close();
+            }
+        }
+        return row;
     }
 
     public boolean isFavoriteLesson(int lessonId) {
@@ -79,7 +658,7 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.LessonEntry.TABLE_NAME,
                     null, MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[] {lessonId + ""}, null, null, null
+                    new String[]{lessonId + ""}, null, null, null
             );
 
             if (cursor != null && cursor.moveToFirst()) {
@@ -98,6 +677,41 @@ public class MathFormulasDao {
         return check;
     }
 
+    public List<Lesson> getFavoriteLessons() {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+        List<Lesson> lessons = new ArrayList<>();
+
+        try {
+            rdb = dbHelper.getReadableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, null,
+                    MathFormulasContract.LessonEntry.COLUMN_IS_FAVORITE + " = ?",
+                    new String[]{"1"}, null, null, null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Lesson lesson = new Lesson(
+                            cursor.getInt(0), cursor.getString(1), cursor.getString(2),
+                            null, true
+                    );
+                    lessons.add(lesson);
+                } while (cursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getFavoriteLessons", e.getLocalizedMessage());
+        } finally {
+            if (null != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return lessons;
+    }
+
     public boolean addFavoriteLesson(int lessonId) {
         SQLiteDatabase wdb = null;
         boolean check = false;
@@ -107,8 +721,8 @@ public class MathFormulasDao {
             ContentValues values = new ContentValues();
             values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FAVORITE, true);
             wdb.update(MathFormulasContract.LessonEntry.TABLE_NAME, values,
-                    MathFormulasContract.COLUMN_ID + " = ?", new String[] {lessonId + ""}
-                    );
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
+            );
         } catch (SQLiteException e) {
             Log.i("Dao_addFavoriteLesson", e.getLocalizedMessage());
         } finally {
@@ -119,16 +733,16 @@ public class MathFormulasDao {
         return check;
     }
 
-    public boolean removeFavoriteLesson(int lessonId) {
+    public int removeFavoriteLesson(int lessonId) {
         SQLiteDatabase wdb = null;
-        boolean check = false;
+        int row = 0;
 
         try {
             wdb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FAVORITE, false);
-            wdb.update(MathFormulasContract.LessonEntry.TABLE_NAME, values,
-                    MathFormulasContract.COLUMN_ID + " = ?", new String[] {lessonId + ""}
+            row = wdb.update(MathFormulasContract.LessonEntry.TABLE_NAME, values,
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
             );
         } catch (SQLiteException e) {
             Log.i("Dao_removeFavorite", e.getLocalizedMessage());
@@ -137,7 +751,7 @@ public class MathFormulasDao {
                 wdb.close();
             }
         }
-        return check;
+        return row;
     }
 
     public int getCurrentVersionId() {
@@ -228,7 +842,7 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.DivisionEntry.TABLE_NAME, null,
                     MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[] {divisionId + ""}, null, null, null, null
+                    new String[]{divisionId + ""}, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 division = new Division(
@@ -257,7 +871,7 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.CategoryEntry.TABLE_NAME, null,
                     MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[] {categoryId + ""}, null, null, null, null
+                    new String[]{categoryId + ""}, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 category = new Category(
@@ -289,8 +903,8 @@ public class MathFormulasDao {
             values.put(MathFormulasContract.GradeEntry.COLUMN_IS_CHOSEN, true);
             wdb.update(
                     MathFormulasContract.GradeEntry.TABLE_NAME, values,
-                    MathFormulasContract.COLUMN_ID + " = ?", new String[] {gradeId + ""}
-                    );
+                    MathFormulasContract.COLUMN_ID + " = ?", new String[]{gradeId + ""}
+            );
         } catch (SQLiteException e) {
             Log.i("Dao_setChosenGrade", e.getLocalizedMessage());
         }
@@ -306,7 +920,7 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.GradeEntry.TABLE_NAME, null,
                     MathFormulasContract.GradeEntry.COLUMN_IS_CHOSEN + " = ?",
-                    new String[] {"1"}, null, null, null, null
+                    new String[]{"1"}, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 grade = new Grade(cursor.getInt(0), cursor.getString(1), 0);
@@ -334,7 +948,7 @@ public class MathFormulasDao {
             cursor = rdb.query(MathFormulasContract.CategoryEntry.TABLE_NAME,
                     null,
                     MathFormulasContract.CategoryEntry.COLUMN_GRADE_ID + " = ?",
-                    new String[] {gradeId + ""}, null, null, null);
+                    new String[]{gradeId + ""}, null, null, null);
             count = cursor.getCount();
         } catch (SQLiteException e) {
             Log.i("Dao_getCatsCountByGrade", e.getLocalizedMessage());
@@ -359,7 +973,7 @@ public class MathFormulasDao {
                     MathFormulasContract.CategoryEntry.COLUMN_GRADE_ID + " = ?";
             cursor = rdb.query(
                     MathFormulasContract.CategoryEntry.TABLE_NAME,
-                    null, selection, new String[] {divisionId + "", gradeId + ""},
+                    null, selection, new String[]{divisionId + "", gradeId + ""},
                     null, null, null
             );
 
@@ -369,6 +983,7 @@ public class MathFormulasDao {
                     Category category = new Category(
                             cursor.getInt(0), cursor.getString(1), cursor.getString(2), division
                     );
+                    category.setProgress(cursor.getInt(6));
                     categories.add(category);
                 } while (cursor.moveToNext());
             }
@@ -460,7 +1075,7 @@ public class MathFormulasDao {
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                   Category category = getCategoryById(cursor.getInt(3));
+                    Category category = getCategoryById(cursor.getInt(3));
                     Lesson lesson = new Lesson(
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getString(2), category, cursor.getInt(5) > 0
@@ -479,6 +1094,39 @@ public class MathFormulasDao {
             }
         }
         return lessons;
+    }
+
+    public Lesson getLessonById(int lessonId) {
+        SQLiteDatabase rdb = null;
+        Cursor cursor = null;
+
+        try {
+            rdb = dbHelper.getWritableDatabase();
+            cursor = rdb.query(
+                    MathFormulasContract.LessonEntry.TABLE_NAME, null,
+                    MathFormulasContract.COLUMN_ID + " = ?",
+                    new String[]{lessonId + ""}, null, null, null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                Category category = getCategoryById(cursor.getInt(3));
+                Lesson lesson = new Lesson(
+                        cursor.getInt(0), cursor.getString(1),
+                        cursor.getString(2), category, cursor.getInt(5) > 0
+                );
+                return lesson;
+            }
+        } catch (SQLiteException e) {
+            Log.i("Dao_getLessonsByCat", e.getLocalizedMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (rdb != null) {
+                rdb.close();
+            }
+        }
+        return null;
     }
 
     public List<Lesson> getLessonsByCategory(int categoryId) {
@@ -501,6 +1149,7 @@ public class MathFormulasDao {
                             cursor.getInt(0), cursor.getString(1),
                             cursor.getString(2), category, cursor.getInt(5) > 0
                     );
+                    lesson.setFinished(cursor.getInt(6));
                     lessons.add(lesson);
                 } while (cursor.moveToNext());
             }
@@ -527,7 +1176,7 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.MathformEntry.TABLE_NAME, null,
                     MathFormulasContract.MathformEntry.COLUMN_LESSON_ID + " = ?",
-                    new String[] {lessonId + ""}, null, null, null
+                    new String[]{lessonId + ""}, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
@@ -560,9 +1209,9 @@ public class MathFormulasDao {
             cursor = rdb.query(
                     MathFormulasContract.ExerciseEntry.TABLE_NAME, null,
                     MathFormulasContract.ExerciseEntry.COLUMN_MATHFORM_ID + " = ?",
-                    new String[] {mathformId + ""}, null, null, null
+                    new String[]{mathformId + ""}, null, null, null
             );
-            if(cursor != null && cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()) {
                 do {
                     Exercise exercise = new Exercise(
                             cursor.getString(1), cursor.getString(2), null
@@ -725,7 +1374,7 @@ public class MathFormulasDao {
                     if (checkExistRecord(MathFormulasContract.QuestionEntry.TABLE_NAME, question.getId())) {
                         // Edit question
                         values.put(MathFormulasContract.QuestionEntry.COLUMN_CONTENT, question.getContent());
-                        values.put(MathFormulasContract.QuestionEntry.COLUMN_CATEGORY_ID, question.getCategory().getId());
+                        values.put(MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID, question.getLesson().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, question.getVersion().getId());
                         wdb.update(
                                 MathFormulasContract.QuestionEntry.TABLE_NAME, values,
@@ -736,7 +1385,7 @@ public class MathFormulasDao {
                         // Insert question
                         values.put(MathFormulasContract.COLUMN_ID, question.getId());
                         values.put(MathFormulasContract.QuestionEntry.COLUMN_CONTENT, question.getContent());
-                        values.put(MathFormulasContract.QuestionEntry.COLUMN_CATEGORY_ID, question.getCategory().getId());
+                        values.put(MathFormulasContract.QuestionEntry.COLUMN_LESSON_ID, question.getLesson().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, question.getVersion().getId());
                         wdb.insert(MathFormulasContract.QuestionEntry.TABLE_NAME, null, values);
                     }

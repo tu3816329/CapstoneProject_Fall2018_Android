@@ -18,21 +18,24 @@ import com.example.capstone.mathnote_capstone.model.Grade;
 import java.util.List;
 
 public class GeometryFragment extends Fragment {
+
     View view;
-    public GeometryFragment() {
-    }
+    RecyclerView categoryRv;
+
+    private MathFormulasDao dao = null;
+    private static Grade grade = null;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_2, container, false);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        RecyclerView categoryRv = view.findViewById(R.id.recycler_view_summary2);
+        categoryRv = view.findViewById(R.id.recycler_view_summary2);
         categoryRv.setLayoutManager(layoutManager);
 
-        MathFormulasDao dao = new MathFormulasDao(getContext());
+        dao = new MathFormulasDao(getContext());
         // Get chosen grade
-        Grade grade = dao.getChosenGrade();
+        grade = dao.getChosenGrade();
         // Get categories by grade and division
         List<Category> categories = dao.getCategoriesByGradeAndDivision(grade.getId(), 2);
         AlgebraAdapter algebraAdapter = new AlgebraAdapter(GeometryFragment.this.getContext(), categories);
@@ -41,5 +44,15 @@ public class GeometryFragment extends Fragment {
         );
         categoryRv.setAdapter(algebraAdapter);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        grade = dao.getChosenGrade();
+        List<Category> categories = dao.getCategoriesByGradeAndDivision(grade.getId(), 2);
+        AlgebraAdapter adapter = new AlgebraAdapter(this.getContext(), categories);
+        categoryRv.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.capstone.mathnote_capstone.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,7 +11,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,24 +22,27 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.example.capstone.mathnote_capstone.adapter.AlgebraAdapter;
 import com.example.capstone.mathnote_capstone.adapter.SearchListAdapter;
 import com.example.capstone.mathnote_capstone.adapter.ViewPagerAdapter;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
+import com.example.capstone.mathnote_capstone.model.Category;
 import com.example.capstone.mathnote_capstone.model.Division;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.model.Lesson;
 import com.example.capstone.mathnote_capstone.model.SearchResults;
 
 import java.util.List;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    SearchListAdapter adapter;
+    private SearchListAdapter adapter;
     List<Lesson> lessons = null;
     String title = "";
+
+    TextView titleTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,36 +50,32 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final TextView titleTv = findViewById(R.id.titleTv);
+        titleTv = findViewById(R.id.titleTv);
+        final View v = findViewById(R.id.search_overlay_view);
 
         /* Get grade name for title */
         MathFormulasDao dao = new MathFormulasDao(this);
+        Bundle bundle = getIntent().getExtras();
         Grade grade = dao.getChosenGrade();
-        if (grade != null) {
-            title = grade.getGradeName();
-        } else {
-            // First time use app
-            int gradeId = Objects.requireNonNull(getIntent().getExtras()).getInt("gradeid");
-            title = getIntent().getExtras().getString("gradename");
-            dao.setChosenGrade(gradeId);
-        }
+        title = grade.getGradeName();
         titleTv.setText(title);
 
         /* Search lesson */
         final ListView suggestionLv = findViewById(R.id.suggestionLv);
-        final SearchView searchView = findViewById(R.id.lessonSv);
+        final SearchView searchView = findViewById(R.id.main_sv);
         // Hide title while searching
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 titleTv.setAlpha(0f);
+                v.setVisibility(View.VISIBLE);
             }
         });
-
         // Show title
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
+                v.setVisibility(View.GONE);
                 titleTv.setAlpha(1f);
                 titleTv.setText(title);
                 suggestionLv.setAdapter(null);
@@ -86,10 +88,9 @@ public class MainActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Lesson lesson = (Lesson) adapterView.getItemAtPosition(i);
                 Intent intent = new Intent(MainActivity.this, WebviewActivity.class);
-                intent.putExtra("lessonid", lesson.getId());
-                intent.putExtra("lessontitle", lesson.getLessonTitle());
-                intent.putExtra("lessoncontent", lesson.getLessonContent());
+                intent.putExtra("lesson", lesson);
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
         lessons = dao.getAllLessons();
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity
                 intent.putExtra("categoryname", "Kết quả tìm kiếm");
                 intent.putExtra("results", new SearchResults(lessons));
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
                 return false;
             }
 
@@ -173,22 +175,39 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_search) {
-            // Handle the camera action
+        if (id == R.id.nav_grade) {
+            Intent intent = new Intent(this, GradeActivity.class);
+            intent.putExtra("activity", "main");
+            startActivityForResult(intent, 3);
         } else if (id == R.id.nav_favorited) {
-
+            Intent intent = new Intent(this, FavoriteActivity.class);
+            intent.putExtra("activity", "main");
+            startActivityForResult(intent, 4);
         } else if (id == R.id.nav_notes) {
-            Intent intent = new Intent(this, UserNoteActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_feedback) {
-
+            Intent intent = new Intent(this, NoteListActivity.class);
+            intent.putExtra("activity", "main");
+            startActivityForResult(intent, 5);
+        } else if (id == R.id.nav_instruction) {
+            Intent intent = new Intent(this, InstructionActivity.class);
+            intent.putExtra("activity", "main");
+            startActivityForResult(intent, 6);
         }
+        overridePendingTransition(R.anim.enter, R.anim.exit);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == 3) {
+                MathFormulasDao dao = new MathFormulasDao(this);
+                Grade grade = dao.getChosenGrade();
+                titleTv.setText(grade.getGradeName());
+            }
+        }
+    }
 }

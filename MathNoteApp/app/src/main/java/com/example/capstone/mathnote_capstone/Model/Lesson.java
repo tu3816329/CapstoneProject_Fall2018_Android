@@ -28,6 +28,8 @@ public class Lesson implements Serializable{
     private Version version;
 
     private boolean isFavorite;
+    private int isFinished;
+    private int score;
 
     public Lesson(){}
 
@@ -85,5 +87,21 @@ public class Lesson implements Serializable{
 
     public void setFavorite(boolean favorite) {
         isFavorite = favorite;
+    }
+
+    public int isFinished() {
+        return isFinished;
+    }
+
+    public void setFinished(int finished) {
+        isFinished = finished;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

@@ -32,6 +32,7 @@ public final class MathFormulasContract {
         public static final String COLUMN_ICON = "category_icon";
         public static final String COLUMN_GRADE_ID = "grade_id";
         public static final String COLUMN_DIVISION_ID = "division_id";
+        public static final String COLUMN_PROGRESS = "progress";
     }
 
     public static class LessonEntry {
@@ -40,6 +41,8 @@ public final class MathFormulasContract {
         public static final String COLUMN_CONTENT = "lesson_content";
         public static final String COLUMN_CATEGORY_ID = "category_id";
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
+        public static final String COLUMN_IS_FINISHED = "is_finished";
+        public static final String COLUMN_SCORE = "score";
     }
 
     public static class MathformEntry {
@@ -59,7 +62,8 @@ public final class MathFormulasContract {
     public static class QuestionEntry {
         public static final String TABLE_NAME = "question";
         public static final String COLUMN_CONTENT = "content";
-        public static final String COLUMN_CATEGORY_ID = "category_id";
+        public static final String COLUMN_LESSON_ID = "lesson_id";
+        public static final String COLUMN_IS_ANSWERED = "is_answered";
     }
 
     public static class QuestionChoiceEntry {
@@ -78,5 +82,12 @@ public final class MathFormulasContract {
         public static final String TABLE_NAME = "user_note";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_DATE = "date";
+    }
+
+    public static class UserChoiceEntry {
+        public static final String TABLE_NAME = "user_choice";
+        public static final String COLUMN_QUESTION_ID = "question_id";
+        public static final String COLUMN_CHOICE_ID = "choice_id";
     }
 }

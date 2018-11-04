@@ -5,21 +5,25 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_search"
+            android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
             android:title="Trang chủ" />
         <item
+            android:id="@+id/nav_grade"
+            android:icon="@drawable/ic_grade"
+            android:title="Lớp" />
+        <item
             android:id="@+id/nav_favorited"
-            android:icon="@drawable/ic_favorites"
+            android:icon="@drawable/ic_heart"
             android:title="Yêu Thích" />
         <item
             android:id="@+id/nav_notes"
             android:icon="@drawable/ic_note"
             android:title="Ghi chú của tôi" />
         <item
-            android:id="@+id/nav_feedback"
-            android:icon="@drawable/ic_feedback"
-            android:title="Phản Hồi" />
+            android:id="@+id/nav_instruction"
+            android:icon="@drawable/ic_instruction"
+            android:title="Hướng dẫn" />
     </group>
 
 

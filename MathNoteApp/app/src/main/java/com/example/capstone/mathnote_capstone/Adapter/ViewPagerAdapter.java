@@ -8,13 +8,11 @@ import com.example.capstone.mathnote_capstone.fragment.AlgebraFragment;
 import com.example.capstone.mathnote_capstone.fragment.GeometryFragment;
 import com.example.capstone.mathnote_capstone.model.Division;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    private List<Division> divisions = new ArrayList<>();
-    private final List<Fragment> fragmentList = new ArrayList<>();
+    private List<Division> divisions;
 
     public ViewPagerAdapter(FragmentManager fm, List<Division> divisions) {
         super(fm);

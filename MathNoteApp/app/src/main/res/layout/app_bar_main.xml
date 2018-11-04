@@ -17,8 +17,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            style="@style/WhiteToolbarStyle">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -29,15 +29,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
+                    android:fontFamily="@font/play_bold"
                     android:textColor="@color/colorWhite"
-                    android:textSize="20dp" />
+                    android:text="Lớp 10"
+                    android:textSize="25sp" />
 
                 <SearchView
-                    android:id="@+id/lessonSv"
+                    android:id="@+id/main_sv"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentRight="true"
-                    android:queryHint="Tìm kiếm bài học" />
+                    android:queryHint="Tìm kiếm ..."
+                    android:layout_marginRight="15dp" />
 
             </RelativeLayout>
         </android.support.v7.widget.Toolbar>
@@ -45,6 +48,7 @@
     </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout
+        android:background="@color/colorWhite"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -58,9 +62,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:tabGravity="fill"
-                app:tabIndicatorColor="@color/colorPrimary"
                 app:tabMode="fixed"
-                app:tabSelectedTextColor="@color/colorPrimary"
+                app:tabIndicatorColor="@color/colorWhite"
+                android:background="@color/colorPrimary"
+                app:tabSelectedTextColor="@color/colorWhite"
                 app:tabTextColor="@color/black" />
 
             <include layout="@layout/content_main" />
@@ -70,10 +75,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <View
+                android:id="@+id/search_overlay_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/search_overlay"
+                android:visibility="gone" />
+
             <ListView
                 android:id="@+id/suggestionLv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
         </FrameLayout>
 
     </RelativeLayout>

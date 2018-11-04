@@ -1,9 +1,11 @@
 package com.example.capstone.mathnote_capstone.activity;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.example.capstone.mathnote_capstone.adapter.GradeAdapter;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
@@ -27,5 +29,12 @@ public class GradeActivity extends AppCompatActivity {
         GradeAdapter adapter = new GradeAdapter(this, grades);
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(Activity.RESULT_OK);
+        finish();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 }
