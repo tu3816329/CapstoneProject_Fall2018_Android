@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.example.capstone.mathnote_capstone.activity.AlgebraDetailActivity;
 import com.example.capstone.mathnote_capstone.R;
-import com.example.capstone.mathnote_capstone.model.Category;
+import com.example.capstone.mathnote_capstone.model.Chapter;
 
 import java.io.Serializable;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHolder>
         implements Serializable {
 
-    private List<Category> categories;
+    private List<Chapter> categories;
     private Context context;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -39,7 +39,7 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
         }
     }
 
-    public AlgebraAdapter(Context context, List<Category> categories) {
+    public AlgebraAdapter(Context context, List<Chapter> categories) {
         this.context = context;
         this.categories = categories;
     }
@@ -53,7 +53,7 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-        holder.categoryTv.setText(categories.get(position).getCategoryName());
+        holder.categoryTv.setText(categories.get(position).getChapterName());
         holder.categoryPb.setProgress((int) categories.get(position).getProgress());
         holder.categoryProgressTv.setText((int) categories.get(position).getProgress() + "");
         holder.categoryView.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +61,7 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
             public void onClick(View view) {
                 Intent intent = new Intent(context, AlgebraDetailActivity.class);
                 intent.putExtra("categoryid", categories.get(position).getId());
-                intent.putExtra("categoryname", categories.get(position).getCategoryName());
+                intent.putExtra("categoryname", categories.get(position).getChapterName());
                 context.startActivity(intent);
                 ((Activity) context).overridePendingTransition(R.anim.enter, R.anim.exit);
             }

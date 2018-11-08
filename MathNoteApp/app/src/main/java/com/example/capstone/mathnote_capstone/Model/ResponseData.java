@@ -17,8 +17,8 @@ public class ResponseData implements Serializable {
     private List<Division> divisions;
 
     @Expose
-    @SerializedName("categories")
-    private List<Category> categories;
+    @SerializedName("chapters")
+    private List<Chapter> chapters;
 
     @Expose
     @SerializedName("lessons")
@@ -47,12 +47,12 @@ public class ResponseData implements Serializable {
     public ResponseData() {}
 
     public ResponseData(
-            List<Grade> grades, List<Division> divisions, List<Category> categories, List<Lesson> lessons,
+            List<Grade> grades, List<Division> divisions, List<Chapter> chapters, List<Lesson> lessons,
             List<Mathform> mathforms, List<Exercise> exercises, List<Question> questions,
             List<QuestionChoice> choices, List<QuestionLevel> levels) {
         this.grades = grades;
         this.divisions = divisions;
-        this.categories = categories;
+        this.chapters = chapters;
         this.lessons = lessons;
         this.mathforms = mathforms;
         this.exercises = exercises;
@@ -77,12 +77,12 @@ public class ResponseData implements Serializable {
         this.divisions = divisions;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public List<Chapter> getChapters() {
+        return chapters;
     }
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    public void setChapters(List<Chapter> chapters) {
+        this.chapters = chapters;
     }
 
     public List<Lesson> getLessons() {

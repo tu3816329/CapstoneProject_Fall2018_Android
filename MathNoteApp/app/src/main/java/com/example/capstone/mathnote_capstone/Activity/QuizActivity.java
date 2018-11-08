@@ -124,7 +124,7 @@ public class QuizActivity extends AppCompatActivity {
         //
         if (progress == questionCount) {
             dao.setLessonFinish(lessonId);
-            dao.updateCategoryProgress(categoryId);
+            dao.updateChapterProgress(categoryId);
             dao.saveQuizScore(lessonId, score);
             reviewQuiz();
         } else {

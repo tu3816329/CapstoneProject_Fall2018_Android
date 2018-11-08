@@ -19,9 +19,9 @@ public class Lesson implements Serializable{
     @Expose
     private String lessonContent;
 
-    @SerializedName("categoryId")
+    @SerializedName("chapterId")
     @Expose
-    private Category category;
+    private Chapter chapter;
 
     @SerializedName("versionId")
     @Expose
@@ -33,11 +33,11 @@ public class Lesson implements Serializable{
 
     public Lesson(){}
 
-    public Lesson(int id, String lessonTitle, String lessonContent, Category category, boolean isFavorite) {
+    public Lesson(int id, String lessonTitle, String lessonContent, Chapter chapter, boolean isFavorite) {
         this.id = id;
         this.lessonTitle = lessonTitle;
         this.lessonContent = lessonContent;
-        this.category = category;
+        this.chapter = chapter;
         this.isFavorite = isFavorite;
     }
 
@@ -65,12 +65,12 @@ public class Lesson implements Serializable{
         this.lessonContent = lessonContent;
     }
 
-    public Category getCategory() {
-        return category;
+    public Chapter getChapter() {
+        return chapter;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
     public Version getVersion() {

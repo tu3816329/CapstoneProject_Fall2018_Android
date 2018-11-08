@@ -73,7 +73,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
             public void onClick(View view) {
                 if (holder.expandBodyLayout.getVisibility() == View.VISIBLE) {
                     holder.expandBodyLayout.setVisibility(View.GONE);
-                } else if(holder.expandBodyLayout.getVisibility() == View.GONE) {
+                } else if (holder.expandBodyLayout.getVisibility() == View.GONE) {
                     holder.expandBodyLayout.setVisibility(View.VISIBLE);
                 }
             }
@@ -89,11 +89,10 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         holder.favoriteIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean isFavorite = dao.isFavoriteLesson(lessonId);
-                    dao.removeFavoriteLesson(lessonId);
-                    view.setVisibility(View.GONE);
-                    holder.unfavoriteIb.setVisibility(View.VISIBLE);
-                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
+                dao.removeFavoriteLesson(lessonId);
+                view.setVisibility(View.GONE);
+                holder.unfavoriteIb.setVisibility(View.VISIBLE);
+                Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
             }
         });
         holder.unfavoriteIb.setOnClickListener(new View.OnClickListener() {

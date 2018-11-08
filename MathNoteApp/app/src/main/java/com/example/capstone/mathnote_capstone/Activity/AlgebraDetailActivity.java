@@ -64,7 +64,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
 
         // Get lesson items
         dao = new MathFormulasDao(this);
-        List<Lesson> lessons = dao.getLessonsByCategory(categoryId);
+        List<Lesson> lessons = dao.getLessonsByChapter(categoryId);
         if (categoryId == -1) {
             SearchResults searchResults = (SearchResults) getIntent().getExtras().getSerializable("results");
             if (searchResults != null) {
@@ -90,8 +90,8 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
                     builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            dao.resetQuizByCategory(categoryId);
-                            dao.updateCategoryProgress(categoryId);
+                            dao.resetQuizByChapter(categoryId);
+                            dao.updateChapterProgress(categoryId);
                             startActivityForResult(intent, QUIZ_REQUEST_CODE);
                             overridePendingTransition(R.anim.enter, R.anim.exit);
                         }
@@ -134,7 +134,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
         super.onResume();
         if(isCreate) {
             isCreate = false;
-            List<Lesson> lessons = dao.getLessonsByCategory(categoryId);
+            List<Lesson> lessons = dao.getLessonsByChapter(categoryId);
             if (categoryId == -1) {
                 SearchResults searchResults = (SearchResults) getIntent().getExtras().getSerializable("results");
                 if (searchResults != null) {

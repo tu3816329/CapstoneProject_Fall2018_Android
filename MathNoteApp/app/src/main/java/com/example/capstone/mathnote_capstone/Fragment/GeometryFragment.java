@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.adapter.AlgebraAdapter;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
-import com.example.capstone.mathnote_capstone.model.Category;
+import com.example.capstone.mathnote_capstone.model.Chapter;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class GeometryFragment extends Fragment {
         // Get chosen grade
         grade = dao.getChosenGrade();
         // Get categories by grade and division
-        List<Category> categories = dao.getCategoriesByGradeAndDivision(grade.getId(), 2);
+        List<Chapter> categories = dao.getChaptersByGradeAndDivision(grade.getId(), 2);
         AlgebraAdapter algebraAdapter = new AlgebraAdapter(GeometryFragment.this.getContext(), categories);
         categoryRv.addItemDecoration (
                 new DividerItemDecoration(GeometryFragment.this.getContext(), LinearLayoutManager.VERTICAL)
@@ -50,7 +50,7 @@ public class GeometryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         grade = dao.getChosenGrade();
-        List<Category> categories = dao.getCategoriesByGradeAndDivision(grade.getId(), 2);
+        List<Chapter> categories = dao.getChaptersByGradeAndDivision(grade.getId(), 2);
         AlgebraAdapter adapter = new AlgebraAdapter(this.getContext(), categories);
         categoryRv.setAdapter(adapter);
         adapter.notifyDataSetChanged();

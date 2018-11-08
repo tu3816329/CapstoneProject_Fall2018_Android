@@ -5,19 +5,19 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Category implements Serializable {
+public class Chapter implements Serializable {
 
     @SerializedName("id")
     @Expose
     private int id;
 
-    @SerializedName("categoryName")
+    @SerializedName("chapterName")
     @Expose
-    private String categoryName;
+    private String chapterName;
 
-    @SerializedName("categoryIcon")
+    @SerializedName("chapterIcon")
     @Expose
-    private String categoryIcon;
+    private String chapterIcon;
 
     @SerializedName("gradeId")
     @Expose
@@ -33,13 +33,13 @@ public class Category implements Serializable {
 
     private float progress;
 
-    public Category() {
+    public Chapter() {
     }
 
-    public Category(int id, String categoryName, String categoryIcon, Division division) {
+    public Chapter(int id, String categoryName, String categoryIcon, Division division) {
         this.id = id;
-        this.categoryName = categoryName;
-        this.categoryIcon = categoryIcon;
+        this.chapterName = categoryName;
+        this.chapterIcon = categoryIcon;
         this.division = division;
     }
 
@@ -51,20 +51,20 @@ public class Category implements Serializable {
         this.id = id;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getChapterName() {
+        return chapterName;
     }
 
-    public void setCategoryName(String name) {
-        this.categoryName = categoryName;
+    public void setChapterName(String chapterName) {
+        this.chapterName = chapterName;
     }
 
-    public String getCategoryIcon() {
-        return categoryIcon;
+    public String getChapterIcon() {
+        return chapterIcon;
     }
 
-    public void setCategoryIcon(String categoryIcon) {
-        this.categoryIcon = categoryIcon;
+    public void setChapterIcon(String chapterIcon) {
+        this.chapterIcon = chapterIcon;
     }
 
     public Grade getGrade() {
@@ -101,6 +101,6 @@ public class Category implements Serializable {
 
     @Override
     public String toString() {
-        return id + " | " + categoryName + " | " + grade.getGradeName() + " | " + division.getDivisionName() + " | " + categoryIcon;
+        return id + " | " + chapterName + " | " + grade.getGradeName() + " | " + division.getDivisionName() + " | " + chapterIcon;
     }
 }

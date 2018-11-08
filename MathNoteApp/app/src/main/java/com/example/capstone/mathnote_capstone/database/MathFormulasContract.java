@@ -26,10 +26,10 @@ public final class MathFormulasContract {
         public static final String COLUMN_NAME = "division_name";
     }
 
-    public static class CategoryEntry {
-        public static final String TABLE_NAME = "category";
-        public static final String COLUMN_NAME = "category_name";
-        public static final String COLUMN_ICON = "category_icon";
+    public static class ChapterEntry {
+        public static final String TABLE_NAME = "chapter";
+        public static final String COLUMN_NAME = "chapter_name";
+        public static final String COLUMN_ICON = "chapter_icon";
         public static final String COLUMN_GRADE_ID = "grade_id";
         public static final String COLUMN_DIVISION_ID = "division_id";
         public static final String COLUMN_PROGRESS = "progress";
@@ -39,7 +39,7 @@ public final class MathFormulasContract {
         public static final String TABLE_NAME = "lesson";
         public static final String COLUMN_TITLE = "lesson_title";
         public static final String COLUMN_CONTENT = "lesson_content";
-        public static final String COLUMN_CATEGORY_ID = "category_id";
+        public static final String COLUMN_CHAPTER_ID = "chapter_id";
         public static final String COLUMN_IS_FAVORITE = "is_favorite";
         public static final String COLUMN_IS_FINISHED = "is_finished";
         public static final String COLUMN_SCORE = "score";
