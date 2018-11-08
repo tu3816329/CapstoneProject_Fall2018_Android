@@ -41,15 +41,15 @@ public class ResponseData implements Serializable {
     private List<QuestionChoice> choices;
 
     @Expose
-    @SerializedName("levels")
-    private List<QuestionLevel> levels;
+    @SerializedName("queries")
+    private List<DeleteQuery> queries;
 
     public ResponseData() {}
 
     public ResponseData(
             List<Grade> grades, List<Division> divisions, List<Chapter> chapters, List<Lesson> lessons,
             List<Mathform> mathforms, List<Exercise> exercises, List<Question> questions,
-            List<QuestionChoice> choices, List<QuestionLevel> levels) {
+            List<QuestionChoice> choices, List<DeleteQuery> queries) {
         this.grades = grades;
         this.divisions = divisions;
         this.chapters = chapters;
@@ -58,7 +58,7 @@ public class ResponseData implements Serializable {
         this.exercises = exercises;
         this.questions = questions;
         this.choices = choices;
-        this.levels = levels;
+        this.queries = queries;
     }
 
     public List<Grade> getGrades() {
@@ -125,11 +125,11 @@ public class ResponseData implements Serializable {
         this.choices = choices;
     }
 
-    public List<QuestionLevel> getLevels() {
-        return levels;
+    public List<DeleteQuery> getQueries() {
+        return queries;
     }
 
-    public void setLevels(List<QuestionLevel> levels) {
-        this.levels = levels;
+    public void setQueries(List<DeleteQuery> queries) {
+        this.queries = queries;
     }
 }

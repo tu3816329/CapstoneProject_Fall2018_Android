@@ -5,7 +5,7 @@ public class APIUtils {
     private APIUtils(){
     };
 
-    public static final String API_URL = "http://192.168.1.63:8080/capstone/android/";
+    public static final String API_URL = "http://172.20.10.3:8080/capstone/android/";
 
     public static MathFormulasService getMathFormulasService() {
         return RetrofitClient.getClient(API_URL).create(MathFormulasService.class);

@@ -1417,29 +1417,6 @@ public class MathFormulasDao {
                     }
                 }
             }
-            // Question Levels
-            List<QuestionLevel> levels = data.getLevels();
-            if (levels != null && !levels.isEmpty()) {
-                for (QuestionLevel level : levels) {
-                    ContentValues values = new ContentValues();
-                    if (checkExistRecord(MathFormulasContract.QuestionLevelEntry.TABLE_NAME, level.getId())) {
-                        // Edit question level
-                        values.put(MathFormulasContract.QuestionLevelEntry.COLUMN_LEVEL, level.getLevel());
-                        values.put(MathFormulasContract.COLUMN_VERSION, level.getVersion().getId());
-                        wdb.update(
-                                MathFormulasContract.QuestionLevelEntry.TABLE_NAME, values,
-                                MathFormulasContract.COLUMN_ID + " = ?",
-                                new String[]{level.getId() + ""}
-                        );
-                    } else {
-                        // Insert question level
-                        values.put(MathFormulasContract.COLUMN_ID, level.getId());
-                        values.put(MathFormulasContract.QuestionLevelEntry.COLUMN_LEVEL, level.getLevel());
-                        values.put(MathFormulasContract.COLUMN_VERSION, level.getVersion().getId());
-                        wdb.insert(MathFormulasContract.QuestionLevelEntry.TABLE_NAME, null, values);
-                    }
-                }
-            }
         } catch (SQLiteException e) {
             Log.i("Dao_SaveResponseData", e.getLocalizedMessage());
         }

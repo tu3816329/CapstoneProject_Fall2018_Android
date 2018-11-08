@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ProgressBar;
@@ -15,6 +16,7 @@ import com.example.capstone.mathnote_capstone.activity.InstructionActivity;
 import com.example.capstone.mathnote_capstone.activity.MainActivity;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDBHelper;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
+import com.example.capstone.mathnote_capstone.model.DeleteQuery;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.model.ResponseData;
 import com.example.capstone.mathnote_capstone.model.Version;
@@ -83,6 +85,14 @@ public class MyAsyncTask extends AsyncTask<Void, Integer, Void> {
                                 // Save new data
                                 publishProgress(70);
                                 dao.saveResponseData(data);
+                                List<DeleteQuery> queries = data.getQueries();
+                                if (queries != null && !queries.isEmpty()) {
+                                    SQLiteDatabase wdb = dbHelper.getWritableDatabase();
+                                    for (DeleteQuery q : queries) {
+                                        wdb.execSQL(q.getQuery());
+                                    }
+                                    wdb.close();
+                                }
                                 publishProgress(100);
                             }
 
