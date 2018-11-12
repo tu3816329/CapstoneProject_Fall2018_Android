@@ -56,11 +56,11 @@ public class WebviewActivity extends AppCompatActivity {
             public void onClick(View view) {
                 boolean isFavorite = dao.isFavoriteLesson(lesson.getId());
                 if (isFavorite) {
-                    dao.removeFavoriteLesson(lesson.getId());
+                    dao.setFavoriteLesson(lesson.getId(), false);
                     view.setBackgroundResource(R.drawable.ic_favorite_border_white);
                     Toast.makeText(WebviewActivity.this, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
                 } else {
-                    dao.addFavoriteLesson(lesson.getId());
+                    dao.setFavoriteLesson(lesson.getId(), true);
                     view.setBackgroundResource(R.drawable.ic_heart_white);
                     Toast.makeText(WebviewActivity.this, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
                 }

@@ -18,6 +18,7 @@ import com.example.capstone.mathnote_capstone.adapter.AlgebraDetailAdapter;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.Lesson;
+import com.example.capstone.mathnote_capstone.model.Quiz;
 import com.example.capstone.mathnote_capstone.model.SearchResults;
 
 
@@ -80,6 +81,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
                 final Intent intent = new Intent(AlgebraDetailActivity.this, QuizActivity.class);
                 intent.putExtra("categoryid", categoryId);
                 final int lessonId = dao.getNextQuizId(categoryId);
+
                 if (lessonId == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(AlgebraDetailActivity.this);
                     builder.setTitle("Đặt lại tiến trình học");

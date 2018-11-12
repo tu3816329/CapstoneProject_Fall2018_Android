@@ -4,10 +4,14 @@ package com.example.capstone.mathnote_capstone.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -24,18 +28,20 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
     private List<Chapter> categories;
     private Context context;
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-        public View categoryView;
-        public TextView categoryTv;
-        public ProgressBar categoryPb;
-        public TextView categoryProgressTv;
+    static class MyViewHolder extends RecyclerView.ViewHolder {
+        View chapterView;
+        TextView chapterTv;
+        ImageView chapterIconIv;
+        ProgressBar chapterPb;
+        TextView chapterProgressTv;
 
-        public MyViewHolder(View v) {
+        MyViewHolder(View v) {
             super(v);
-            categoryView = v;
-            categoryTv = v.findViewById(R.id.algebraTitle);
-            categoryPb = v.findViewById(R.id.category_pb);
-            categoryProgressTv = v.findViewById(R.id.category_progress_tv);
+            chapterView = v;
+            chapterTv = v.findViewById(R.id.algebraTitle);
+            chapterIconIv = v.findViewById(R.id.chapter_icon_iv);
+            chapterPb = v.findViewById(R.id.category_pb);
+            chapterProgressTv = v.findViewById(R.id.category_progress_tv);
         }
     }
 
@@ -46,22 +52,34 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = (View) LayoutInflater.from(parent.getContext())
+        View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_algebra_item, parent, false);
         return new MyViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
-        holder.categoryTv.setText(categories.get(position).getChapterName());
-        holder.categoryPb.setProgress((int) categories.get(position).getProgress());
-        holder.categoryProgressTv.setText((int) categories.get(position).getProgress() + "");
-        holder.categoryView.setOnClickListener(new View.OnClickListener() {
+    public void onBindViewHolder(MyViewHolder holder, int position) {
+        final Chapter chapter = categories.get(position);
+        holder.chapterTv.setText(chapter.getChapterName());
+        if(chapter.getChapterIcon() != null) {
+            byte[] bytes = Base64.decode(chapter.getChapterIcon(), Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0 , bytes.length);
+            if(bitmap!= null) {
+//                Drawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(
+//                        bitmap, 300, 300, true
+//                ));
+                holder.chapterIconIv.setImageBitmap(bitmap);
+            }
+        }
+        //
+        holder.chapterPb.setProgress((int) categories.get(position).getProgress());
+        holder.chapterProgressTv.setText((int) categories.get(position).getProgress() + "");
+        holder.chapterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, AlgebraDetailActivity.class);
-                intent.putExtra("categoryid", categories.get(position).getId());
-                intent.putExtra("categoryname", categories.get(position).getChapterName());
+                intent.putExtra("categoryid", chapter.getId());
+                intent.putExtra("categoryname", chapter.getChapterName());
                 context.startActivity(intent);
                 ((Activity) context).overridePendingTransition(R.anim.enter, R.anim.exit);
             }

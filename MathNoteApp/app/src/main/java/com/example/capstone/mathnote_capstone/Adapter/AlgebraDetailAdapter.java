@@ -48,10 +48,19 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         final String lessonContent = lessons.get(position).getLessonContent();
 
         final MathFormulasDao dao = new MathFormulasDao(context);
-        int score = dao.getQuizScore(lessonId);
-        holder.lessonScorePb.setProgress(score);
-        holder.lessonScoreTv.setText(score + "");
-        holder.mathformNumTv.setText(dao.getMathformByLesson(lessonId).size() + " dạng bài");
+        if(lessons.get(position).isFinished() == 0) {
+            holder.lessonScorePbBackground.setVisibility(View.INVISIBLE);
+            holder.lessonScorePb.setVisibility(View.INVISIBLE);
+            holder.lessonScoreTv.setVisibility(View.INVISIBLE);
+        } else {
+            int score = dao.getQuizScore(lessonId);
+            holder.lessonScorePb.setProgress(score);
+            holder.lessonScoreTv.setText(score + "");
+        }
+
+        String lessonDetail = dao.getMathformByLesson(lessonId).size() + " dạng bài, ";
+        lessonDetail += dao.getQuestionsByLesson(lessonId).size() + " câu hỏi";
+        holder.mathformNumTv.setText(lessonDetail);
         lessonTitleTv.setText(lessonTitle);
         String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
         webView.evaluateJavascript("document.body.style.backgroundColor = \"#d8d4d4\"", null);
@@ -89,7 +98,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         holder.favoriteIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dao.removeFavoriteLesson(lessonId);
+                dao.setFavoriteLesson(lessonId, false);
                 view.setVisibility(View.GONE);
                 holder.unfavoriteIb.setVisibility(View.VISIBLE);
                 Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show();
@@ -98,7 +107,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         holder.unfavoriteIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dao.addFavoriteLesson(lessonId);
+                dao.setFavoriteLesson(lessonId, true);
                 view.setVisibility(View.GONE);
                 holder.favoriteIb.setVisibility(View.VISIBLE);
                 Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show();
@@ -123,7 +132,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         private LinearLayout expandBodyLayout;
         private RelativeLayout lessonItem;
         private TextView mathformNumTv, lessonScoreTv;
-        ProgressBar lessonScorePb;
+        ProgressBar lessonScorePb, lessonScorePbBackground;
 
         private static AlgebraDetailAdapter.RecyclerHolder buildFor(ViewGroup viewGroup) {
             return new AlgebraDetailAdapter.RecyclerHolder(LayoutInflater.from(viewGroup.getContext()).inflate(LAYOUT, viewGroup, false));
@@ -131,6 +140,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
 
         private RecyclerHolder(View itemView) {
             super(itemView);
+            lessonScorePbBackground = itemView.findViewById(R.id.lesson_score_pb_bg);
             lessonScoreTv = itemView.findViewById(R.id.lesson_score_tv);
             lessonScorePb = itemView.findViewById(R.id.lesson_score_pb);
             mathformNumTv = itemView.findViewById(R.id.mathforms_num);

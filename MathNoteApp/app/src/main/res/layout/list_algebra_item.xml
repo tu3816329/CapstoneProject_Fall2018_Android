@@ -10,12 +10,12 @@
     android:paddingRight="?listPreferredItemPaddingRight">
 
     <ImageView
-        android:id="@+id/img_title"
+        android:id="@+id/chapter_icon_iv"
         android:layout_width="40dp"
+        android:adjustViewBounds="true"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
         android:scaleType="centerInside"
-        android:src="@drawable/ic_account"
+        android:src="@drawable/ic_chapter"
         android:layout_centerVertical="true"/>
 
     <LinearLayout
@@ -27,17 +27,15 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_toLeftOf="@id/category_progress_fl"
-        android:layout_toRightOf="@+id/img_title"
-        android:orientation="vertical"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        android:layout_toRightOf="@+id/chapter_icon_iv"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/algebraTitle"
             style="@style/TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:fontFamily="@font/play_regular"
             android:text="Bất đẳng thức"
             android:textSize="16dp" />
     </LinearLayout>
@@ -77,17 +75,4 @@
         android:gravity="center_vertical"
         android:text="100"
         android:textAlignment="center" />
-
-    <!--<ImageView-->
-    <!--android:id="@+id/img_chevron_right"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentRight="true"-->
-    <!--android:layout_marginRight="24dp"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:layout_marginLeft="16dp"-->
-    <!--android:layout_marginStart="16dp"-->
-    <!--android:layout_marginTop="16dp"-->
-    <!--android:scaleType="centerInside"-->
-    <!--android:src="@drawable/ic_chevron_right_black_24dp"/>-->
 </RelativeLayout>

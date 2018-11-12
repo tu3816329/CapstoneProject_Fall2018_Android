@@ -15,7 +15,6 @@ import com.example.capstone.mathnote_capstone.model.Lesson;
 import com.example.capstone.mathnote_capstone.model.Mathform;
 import com.example.capstone.mathnote_capstone.model.Question;
 import com.example.capstone.mathnote_capstone.model.QuestionChoice;
-import com.example.capstone.mathnote_capstone.model.QuestionLevel;
 import com.example.capstone.mathnote_capstone.model.Quiz;
 import com.example.capstone.mathnote_capstone.model.ResponseData;
 import com.example.capstone.mathnote_capstone.model.UserChoice;
@@ -79,6 +78,7 @@ public class MathFormulasDao {
         try {
             wdb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
+            values.put(MathFormulasContract.LessonEntry.COLUMN_SCORE, 0);
             values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FINISHED, false);
             int row = wdb.update(
                     MathFormulasContract.LessonEntry.TABLE_NAME, values,
@@ -276,7 +276,14 @@ public class MathFormulasDao {
         try {
             wdb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            int progress = countFinishedLesson(chapterId) * 100 / getLessonsByChapter(chapterId).size();
+            List<Lesson> lessons = getLessonsByChapter(chapterId);
+            int quizSize = lessons.size();
+            for(Lesson lesson : lessons) {
+                if(getQuestionsByLesson(lesson.getId()).isEmpty()) {
+                    quizSize--;
+                }
+            }
+            int progress = countFinishedLesson(chapterId) * 100 / quizSize;
             values.put(MathFormulasContract.ChapterEntry.COLUMN_PROGRESS, progress);
             wdb.update(
                     MathFormulasContract.ChapterEntry.TABLE_NAME, values,
@@ -325,7 +332,13 @@ public class MathFormulasDao {
                     new String[]{"0", chapterId + ""}, null, null, "id ASC", "1"
             );
             if (cursor != null && cursor.moveToFirst()) {
-                return cursor.getInt(0);
+                List<Quiz> quizzes = getUnansweredQuestion(cursor.getInt(0));
+                if(quizzes.isEmpty()) {
+                    setLessonFinish(cursor.getInt(0));
+                    getNextQuizId(chapterId);
+                } else {
+                    return cursor.getInt(0);
+                }
             }
         } catch (SQLiteException e) {
             Log.i("Dao_nextQuiz", e.getLocalizedMessage());
@@ -712,14 +725,14 @@ public class MathFormulasDao {
         return lessons;
     }
 
-    public boolean addFavoriteLesson(int lessonId) {
+    public boolean setFavoriteLesson(int lessonId, boolean isFavorite) {
         SQLiteDatabase wdb = null;
         boolean check = false;
 
         try {
             wdb = dbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FAVORITE, true);
+            values.put(MathFormulasContract.LessonEntry.COLUMN_IS_FAVORITE, isFavorite);
             wdb.update(MathFormulasContract.LessonEntry.TABLE_NAME, values,
                     MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
             );
