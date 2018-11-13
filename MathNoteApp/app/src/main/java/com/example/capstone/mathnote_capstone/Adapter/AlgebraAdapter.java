@@ -25,7 +25,7 @@ import java.util.List;
 public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHolder>
         implements Serializable {
 
-    private List<Chapter> categories;
+    private List<Chapter> chapters;
     private Context context;
 
     static class MyViewHolder extends RecyclerView.ViewHolder {
@@ -45,9 +45,9 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
         }
     }
 
-    public AlgebraAdapter(Context context, List<Chapter> categories) {
+    public AlgebraAdapter(Context context, List<Chapter> chapters) {
         this.context = context;
-        this.categories = categories;
+        this.chapters = chapters;
     }
 
     @Override
@@ -59,21 +59,18 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final Chapter chapter = categories.get(position);
+        final Chapter chapter = chapters.get(position);
         holder.chapterTv.setText(chapter.getChapterName());
         if(chapter.getChapterIcon() != null) {
             byte[] bytes = Base64.decode(chapter.getChapterIcon(), Base64.DEFAULT);
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0 , bytes.length);
             if(bitmap!= null) {
-//                Drawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(
-//                        bitmap, 300, 300, true
-//                ));
                 holder.chapterIconIv.setImageBitmap(bitmap);
             }
         }
         //
-        holder.chapterPb.setProgress((int) categories.get(position).getProgress());
-        holder.chapterProgressTv.setText((int) categories.get(position).getProgress() + "");
+        holder.chapterPb.setProgress((int) chapters.get(position).getProgress());
+        holder.chapterProgressTv.setText(String.valueOf((int) chapters.get(position).getProgress()));
         holder.chapterView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +85,6 @@ public class AlgebraAdapter extends RecyclerView.Adapter<AlgebraAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return categories.size();
+        return chapters.size();
     }
 }
