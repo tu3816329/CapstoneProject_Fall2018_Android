@@ -1,11 +1,9 @@
 package com.example.capstone.mathnote_capstone.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -34,12 +32,11 @@ public class UserNoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Thêm ghi chú");
+        actionBar.setTitle("Ghi chú");
         //
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             note = (UserNote) bundle.getSerializable("usernote");
-            actionBar.setTitle("Sửa ghi chú");
         }
         //
         actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_left);
@@ -55,8 +52,16 @@ public class UserNoteActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
-        webView.addJavascriptInterface(new WebJsInterface(), "Android");
-        webView.loadUrl(APIUtils.API_URL + "math-editor");
+        if(AppUtils.checkInternetConnection(this)) {
+            webView.addJavascriptInterface(new WebJsInterface(), "Android");
+            webView.loadUrl(APIUtils.API_URL + "math-editor");
+        } else {
+            webView.loadDataWithBaseURL(
+                    null, AppUtils.MATHJAX1 + note.getContent() + AppUtils.MATHJAX2,
+                    "text/html", "utf-8", ""
+            );
+            webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
+        }
 
         if (note != null) {
             noteTitleEt.setText(note.getTitle());

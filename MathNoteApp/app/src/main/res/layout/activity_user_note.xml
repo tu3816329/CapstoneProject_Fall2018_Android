@@ -24,6 +24,10 @@
         android:id="@+id/save_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/custom_button"
+        android:textColor="@color/colorWhite"
+        android:layout_marginTop="5dp"
         android:text="Lưu"/>
+
 
 </LinearLayout>

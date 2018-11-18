@@ -10,6 +10,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,7 +19,6 @@ import com.example.capstone.mathnote_capstone.adapter.AlgebraDetailAdapter;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.Lesson;
-import com.example.capstone.mathnote_capstone.model.Quiz;
 import com.example.capstone.mathnote_capstone.model.SearchResults;
 
 
@@ -35,6 +35,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
     private static int categoryId = 0;
     private static final int QUIZ_REQUEST_CODE = 2;
     private boolean isCreate = false;
+    private List<Lesson> lessons;
 
     @BindView(R.id.listAlgebraDetail)
     RecyclerView recyclerView;
@@ -47,6 +48,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
         //
         Toolbar toolbar = findViewById(R.id.toolbar);
         final TextView categoryTitleTv = findViewById(R.id.category_title_tv);
+        ImageView quizIv = findViewById(R.id.quiz_iv);
         // Set title
         categoryId = getIntent().getExtras().getInt("categoryid");
         title = getIntent().getExtras().getString("categoryname");
@@ -65,8 +67,9 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
 
         // Get lesson items
         dao = new MathFormulasDao(this);
-        List<Lesson> lessons = dao.getLessonsByChapter(categoryId);
+        lessons = dao.getLessonsByChapter(categoryId);
         if (categoryId == -1) {
+            quizIv.setVisibility(View.GONE);
             SearchResults searchResults = (SearchResults) getIntent().getExtras().getSerializable("results");
             if (searchResults != null) {
                 lessons = searchResults.getLessons();
@@ -74,7 +77,6 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
         }
         adapter.setLessons(lessons);
 
-        ImageView quizIv = findViewById(R.id.quiz_iv);
         quizIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,6 +155,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
                     new Intent(this, AlgebraDetailActivity.class)
                             .putExtra("categoryid", categoryId)
                             .putExtra("categoryname", title)
+                            .putExtra("results", getIntent().getExtras().getSerializable("results"))
             );
             overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
         }
@@ -169,6 +172,7 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
                         new Intent(this, AlgebraDetailActivity.class)
                         .putExtra("categoryid", categoryId)
                         .putExtra("categoryname", title)
+                        .putExtra("results", getIntent().getExtras().getSerializable("results"))
                 );
                 overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
             }

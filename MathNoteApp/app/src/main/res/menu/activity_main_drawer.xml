@@ -25,7 +25,4 @@
             android:icon="@drawable/ic_instruction"
             android:title="Hướng dẫn" />
     </group>
-
-
-
 </menu>

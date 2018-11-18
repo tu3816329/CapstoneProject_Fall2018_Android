@@ -11,9 +11,8 @@
 
     <ImageView
         android:id="@+id/chapter_icon_iv"
-        android:layout_width="40dp"
-        android:adjustViewBounds="true"
-        android:layout_height="40dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:scaleType="centerInside"
         android:src="@drawable/ic_chapter"
         android:layout_centerVertical="true"/>

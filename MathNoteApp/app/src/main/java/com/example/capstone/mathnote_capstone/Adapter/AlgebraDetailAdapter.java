@@ -26,8 +26,6 @@ import java.util.List;
 
 
 public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDetailAdapter.RecyclerHolder> {
-    private static WebView webView;
-    private static TextView lessonTitleTv;
     private final List<Lesson> lessons = new ArrayList<>();
 
     private Context context;
@@ -55,18 +53,17 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         } else {
             int score = dao.getQuizScore(lessonId);
             holder.lessonScorePb.setProgress(score);
-            holder.lessonScoreTv.setText(score + "");
+            holder.lessonScoreTv.setText(String.valueOf(score));
         }
 
         String lessonDetail = dao.getMathformByLesson(lessonId).size() + " dạng bài, ";
         lessonDetail += dao.getQuestionsByLesson(lessonId).size() + " câu hỏi";
         holder.mathformNumTv.setText(lessonDetail);
-        lessonTitleTv.setText(lessonTitle);
+        holder.lessonTitleTv.setText(lessonTitle);
         String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
-        webView.evaluateJavascript("document.body.style.backgroundColor = \"#d8d4d4\"", null);
-        webView.loadDataWithBaseURL(null, data, "text/html",
+        holder.webView.loadDataWithBaseURL(null, data, "text/html",
                 "utf-8", "");
-        webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
+        holder.webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
         final Activity activity = (Activity) context;
         holder.lessonDetailIb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,8 +78,10 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
             @Override
             public void onClick(View view) {
                 if (holder.expandBodyLayout.getVisibility() == View.VISIBLE) {
+                    holder.lessonItem.setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
                     holder.expandBodyLayout.setVisibility(View.GONE);
                 } else if (holder.expandBodyLayout.getVisibility() == View.GONE) {
+                    holder.lessonItem.setBackgroundColor(context.getResources().getColor(R.color.lightGray));
                     holder.expandBodyLayout.setVisibility(View.VISIBLE);
                 }
             }
@@ -125,11 +124,13 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         notifyDataSetChanged();
     }
 
-    public final static class RecyclerHolder extends RecyclerView.ViewHolder {
+    final static class RecyclerHolder extends RecyclerView.ViewHolder {
 
         private static final int LAYOUT = R.layout.list_detail_algebra_item;
         private ImageButton unfavoriteIb, favoriteIb, lessonDetailIb;
         private LinearLayout expandBodyLayout;
+        private WebView webView;
+        private TextView lessonTitleTv;
         private RelativeLayout lessonItem;
         private TextView mathformNumTv, lessonScoreTv;
         ProgressBar lessonScorePb, lessonScorePbBackground;
@@ -154,9 +155,9 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
             webView = itemView.findViewById(R.id.expand_webview);
             webView.getSettings().setLoadsImagesAutomatically(true);
             webView.getSettings().setJavaScriptEnabled(true);
+            webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
             webView.getSettings().setBuiltInZoomControls(true);
             webView.getSettings().setDisplayZoomControls(false);
-            webView.setBackgroundColor(itemView.getResources().getColor(R.color.lightGray));
         }
     }
 }

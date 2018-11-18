@@ -10,11 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.adapter.NoteListAdapter;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.UserNote;
+import com.example.capstone.mathnote_capstone.utils.AppUtils;
 
 import java.util.List;
 
@@ -44,8 +46,12 @@ public class NoteListActivity extends AppCompatActivity {
         addNoteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(NoteListActivity.this, UserNoteActivity.class);
-                startActivityForResult(intent, 2);
+                if(AppUtils.checkInternetConnection(NoteListActivity.this)) {
+                    Intent intent = new Intent(NoteListActivity.this, UserNoteActivity.class);
+                    startActivityForResult(intent, 2);
+                } else {
+                    Toast.makeText(NoteListActivity.this, "Cần có kết nối internet để sử dụng tính năng này", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

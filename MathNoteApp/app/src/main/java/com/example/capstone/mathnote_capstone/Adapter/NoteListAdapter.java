@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,9 +45,9 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.NoteLi
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, UserNoteActivity.class);
-                intent.putExtra("usernote", note);
-                activity.startActivityForResult(intent, 1);
+                    Intent intent = new Intent(context, UserNoteActivity.class);
+                    intent.putExtra("usernote", note);
+                    activity.startActivityForResult(intent, 1);
             }
         });
         holder.deleteNoteIb.setOnClickListener(new View.OnClickListener() {
