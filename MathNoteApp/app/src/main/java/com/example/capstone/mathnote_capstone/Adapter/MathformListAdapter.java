@@ -44,11 +44,9 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
 
         if(!exercises.isEmpty()) {
             data.append("<h4 style=\"color: #6508a8\">Bài tập thực hành</h4>");
-            int seq = 1;
             for(Exercise exercise : exercises) {
-                data.append("<p style=\"font-weight: bold\">Bài " + (seq++));
-                data.append(exercise.getTopic().substring(3));
-                data.append("<p>Đáp án: " + exercise.getAnswer().substring(3) + "<br>");
+                data.append("<p style=\"font-weight: bold\">" + exercise.getTopic() + "</p>");
+                data.append("<p>Đáp án: " + exercise.getAnswer() + "</p><br>");
             }
         }
         data.append(AppUtils.MATHJAX2);
@@ -63,10 +61,10 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
             public void onClick(View view) {
                 if (holder.webView.getVisibility() == View.GONE) {
                     holder.webView.setVisibility(View.VISIBLE);
-                    holder.mfIndicatorTv.setImageResource(R.drawable.ic_arrow_down);
+                    holder.mfIndicatorTv.setImageResource(R.drawable.ic_arrow_up);
                 } else if (holder.webView.getVisibility() == View.VISIBLE) {
                     holder.webView.setVisibility(View.GONE);
-                    holder.mfIndicatorTv.setImageResource(R.drawable.ic_arrow_right);
+                    holder.mfIndicatorTv.setImageResource(R.drawable.ic_arrow_down);
                 }
             }
         });
@@ -90,6 +88,12 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
             exerciseNumTv = itemView.findViewById(R.id.exercise_num_tv);
             mfIndicatorTv = itemView.findViewById(R.id.mf_indicator_iv);
             webView = itemView.findViewById(R.id.mathform_detail_wv);
+            // Web view configuration
+            webView.getSettings().setLoadsImagesAutomatically(true);
+            webView.getSettings().setJavaScriptEnabled(true);
+//            webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+//            webView.getSettings().setBuiltInZoomControls(true);
+//            webView.getSettings().setDisplayZoomControls(false);
         }
     }
 }

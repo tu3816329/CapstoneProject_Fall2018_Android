@@ -353,23 +353,19 @@ public class MathFormulasDao {
         return 0;
     }
 
-    public Question getQuestionById(int questionId) {
+    public int getQuestionsByChapter(int chapterId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
+        int count = 0;
         try {
             rdb = dbHelper.getReadableDatabase();
-            cursor = rdb.query(
-                    MathFormulasContract.QuestionEntry.TABLE_NAME, null,
-                    MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[]{questionId + ""}, null, null, null
-            );
-            if (cursor != null && cursor.moveToFirst()) {
-                Lesson lesson = getLessonById(cursor.getInt(2));
-                Question question = new Question(cursor.getInt(0), cursor.getString(1), lesson);
-                return question;
+            List<Lesson> lessons = getLessonsByChapter(chapterId);
+
+            for(Lesson lesson : lessons) {
+                count += getQuestionsByLesson(lesson.getId()).size();
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getQuestionById", e.getLocalizedMessage());
+            Log.i("Dao_getQuestionByChap", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -378,7 +374,7 @@ public class MathFormulasDao {
                 rdb.close();
             }
         }
-        return null;
+        return count;
     }
 
     public int getQuizScore(int lessonId) {

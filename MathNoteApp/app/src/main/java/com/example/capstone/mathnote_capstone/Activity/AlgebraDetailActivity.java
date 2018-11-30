@@ -10,7 +10,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -49,9 +48,21 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
         Toolbar toolbar = findViewById(R.id.toolbar);
         final TextView categoryTitleTv = findViewById(R.id.category_title_tv);
         ImageView quizIv = findViewById(R.id.quiz_iv);
-        // Set title
+
+        // Extras
         categoryId = getIntent().getExtras().getInt("categoryid");
         title = getIntent().getExtras().getString("categoryname");
+
+        // Hide quiz icon if chapter has no question
+        dao = new MathFormulasDao(this);
+        boolean hasQuestions = dao.getQuestionsByChapter(categoryId) > 0;
+        if(!hasQuestions) {
+            quizIv.setVisibility(View.GONE);
+        } else {
+            quizIv.setVisibility(View.VISIBLE);
+        }
+
+        // Set title
         categoryTitleTv.setText(title);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -66,7 +77,6 @@ public class AlgebraDetailActivity extends AppCompatActivity implements Serializ
         recyclerView.setAdapter(adapter);
 
         // Get lesson items
-        dao = new MathFormulasDao(this);
         lessons = dao.getLessonsByChapter(categoryId);
         if (categoryId == -1) {
             quizIv.setVisibility(View.GONE);

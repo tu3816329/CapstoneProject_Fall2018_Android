@@ -25,7 +25,7 @@ public class AppUtils {
         "\t\t\timg{width: 100vw; max-width: 100%}\n" +
         "\t\t</style>\n" +
         "\t</head>\n" +
-        "\t<body style=\"font-size:18px; width: 100vw; font-family: mathjax;\" >\n" +
+        "\t<body style=\"font-size:18px; font-family: mathjax\" >\n" +
         "\t\t<script type=\"text/x-mathjax-config\">\n" +
         "            MathJax.Hub.Config({\n" +
         "\t\t\t\tCommonHTML: { linebreaks: { automatic: true },EqnChunk:(MathJax.Hub.Browser.isMobile?10:50) },\n" +

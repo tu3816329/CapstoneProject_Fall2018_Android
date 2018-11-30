@@ -78,9 +78,9 @@ public class WebviewActivity extends AppCompatActivity {
         webView.setWebViewClient(new MyBrowser());
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
+//        webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+//        webView.getSettings().setBuiltInZoomControls(true);
+//        webView.getSettings().setDisplayZoomControls(false);
 
         // Get mathforms
         String data = AppUtils.MATHJAX1 + lesson.getLessonContent() + AppUtils.MATHJAX2;

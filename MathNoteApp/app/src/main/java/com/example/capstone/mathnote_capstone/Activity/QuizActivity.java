@@ -134,7 +134,7 @@ public class QuizActivity extends AppCompatActivity {
         }
     }
 
-        private void moveToNextQuestion() {
+    private void moveToNextQuestion() {
         quiz = quizzes.get(0);
         String content = AppUtils.MATHJAX1 + quiz.getQuestion().getContent() +
                 "<p>A. " + quiz.getChoices().get(0).getContent().substring(3) +
