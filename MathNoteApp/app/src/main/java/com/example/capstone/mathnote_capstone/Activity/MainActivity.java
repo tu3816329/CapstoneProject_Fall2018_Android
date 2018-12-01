@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,8 +38,10 @@ public class MainActivity extends AppCompatActivity
     private SearchListAdapter adapter;
     List<Lesson> lessons = null;
     String title = "";
+    private static int divisionId = 0;
 
     TextView titleTv;
+    TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         // Add division tab
-        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        tabLayout = findViewById(R.id.tabLayout);
         ViewPager viewPager = findViewById(R.id.viewPager_id);
         List<Division> divisions = dao.getAllDivisions();
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), divisions);
@@ -129,6 +132,11 @@ public class MainActivity extends AppCompatActivity
         viewPager.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        // Set selected tab
+        divisionId = getIntent().getExtras().getInt("divisionid");
+        int index = (divisionId == 1) ? 0 : 1;
+        TabLayout.Tab tab = tabLayout.getTabAt(index);
+        tab.select();
         //
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -200,6 +208,10 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 3) {
+                divisionId = data.getExtras().getInt("divisionid");
+                int index = (divisionId == 1) ? 0 : 1;
+                TabLayout.Tab tab = tabLayout.getTabAt(index);
+                tab.select();
                 MathFormulasDao dao = new MathFormulasDao(this);
                 Grade grade = dao.getChosenGrade();
                 titleTv.setText(grade.getGradeName());

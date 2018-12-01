@@ -46,7 +46,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         final String lessonContent = lessons.get(position).getLessonContent();
 
         final MathFormulasDao dao = new MathFormulasDao(context);
-        if(lessons.get(position).isFinished() == 0) {
+        if(lessons.get(position).isFinished() == 0 || dao.getQuestionsByLesson(lessonId).size() == 0) {
             holder.lessonScorePbBackground.setVisibility(View.INVISIBLE);
             holder.lessonScorePb.setVisibility(View.INVISIBLE);
             holder.lessonScoreTv.setVisibility(View.INVISIBLE);
@@ -60,10 +60,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         lessonDetail += dao.getQuestionsByLesson(lessonId).size() + " câu hỏi";
         holder.mathformNumTv.setText(lessonDetail);
         holder.lessonTitleTv.setText(lessonTitle);
-        String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
-        holder.webView.loadDataWithBaseURL(null, data, "text/html",
-                "utf-8", "");
-        holder.webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
+        final String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
         final Activity activity = (Activity) context;
         holder.lessonDetailIb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +78,12 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
                     holder.lessonItem.setBackgroundColor(context.getResources().getColor(R.color.colorWhite));
                     holder.expandBodyLayout.setVisibility(View.GONE);
                 } else if (holder.expandBodyLayout.getVisibility() == View.GONE) {
+                    if(!holder.isLoaded) {
+                        holder.isLoaded = true;
+                        holder.webView.loadDataWithBaseURL(null, data, "text/html",
+                                "utf-8", "");
+                        holder.webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
+                    }
                     holder.lessonItem.setBackgroundColor(context.getResources().getColor(R.color.lightGray));
                     holder.expandBodyLayout.setVisibility(View.VISIBLE);
                 }
@@ -124,8 +127,8 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         notifyDataSetChanged();
     }
 
-    final static class RecyclerHolder extends RecyclerView.ViewHolder {
-
+    static class RecyclerHolder extends RecyclerView.ViewHolder {
+        private boolean isLoaded;
         private static final int LAYOUT = R.layout.list_detail_algebra_item;
         private ImageButton unfavoriteIb, favoriteIb, lessonDetailIb;
         private LinearLayout expandBodyLayout;
@@ -141,6 +144,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
 
         private RecyclerHolder(View itemView) {
             super(itemView);
+            isLoaded = false;
             lessonScorePbBackground = itemView.findViewById(R.id.lesson_score_pb_bg);
             lessonScoreTv = itemView.findViewById(R.id.lesson_score_tv);
             lessonScorePb = itemView.findViewById(R.id.lesson_score_pb);

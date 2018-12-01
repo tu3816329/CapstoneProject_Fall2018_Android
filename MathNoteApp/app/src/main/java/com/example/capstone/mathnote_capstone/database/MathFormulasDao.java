@@ -257,7 +257,16 @@ public class MathFormulasDao {
                             MathFormulasContract.LessonEntry.COLUMN_CHAPTER_ID + " = ?",
                     new String[]{chapterId + ""}, null, null, null
             );
-            return cursor.getCount();
+            int count = cursor.getCount();
+            if (cursor.moveToFirst() && cursor != null) {
+                do {
+                    int questionNum = getQuestionsByLesson(cursor.getInt(0)).size();
+                    if(questionNum == 0) {
+                        count--;
+                    }
+                } while (cursor.moveToNext());
+            }
+            return count;
         } catch (SQLiteException e) {
             Log.i("Dao_nextQuiz", e.getLocalizedMessage());
         } finally {
@@ -309,7 +318,7 @@ public class MathFormulasDao {
                     MathFormulasContract.COLUMN_ID + " = ?", new String[]{lessonId + ""}
             );
         } catch (SQLiteException e) {
-            Log.i("Dao_nextQuiz", e.getLocalizedMessage());
+            Log.i("Dao_setLessonFinish", e.getLocalizedMessage());
         } finally {
             if (wdb != null) {
                 wdb.close();
@@ -323,6 +332,7 @@ public class MathFormulasDao {
     public int getNextQuizId(int chapterId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
+        int quizId = 0;
         try {
             rdb = dbHelper.getReadableDatabase();
             cursor = rdb.query(
@@ -335,9 +345,9 @@ public class MathFormulasDao {
                 List<Quiz> quizzes = getUnansweredQuestion(cursor.getInt(0));
                 if(quizzes.isEmpty()) {
                     setLessonFinish(cursor.getInt(0));
-                    getNextQuizId(chapterId);
+                    quizId = getNextQuizId(chapterId);
                 } else {
-                    return cursor.getInt(0);
+                    quizId = cursor.getInt(0);
                 }
             }
         } catch (SQLiteException e) {
@@ -350,7 +360,7 @@ public class MathFormulasDao {
                 rdb.close();
             }
         }
-        return 0;
+        return quizId;
     }
 
     public int getQuestionsByChapter(int chapterId) {
@@ -932,7 +942,7 @@ public class MathFormulasDao {
                     new String[]{"1"}, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
-                grade = new Grade(cursor.getInt(0), cursor.getString(1), 0);
+                grade = new Grade(cursor.getInt(0), cursor.getString(1));
             }
         } catch (SQLiteException e) {
             Log.i("Dao_getChosenGrade", e.getLocalizedMessage());
@@ -1022,9 +1032,7 @@ public class MathFormulasDao {
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    int gradeId = cursor.getInt(0);
-                    int numOfChapters = getChaptersCountByGrade(gradeId);
-                    Grade grade = new Grade(gradeId, cursor.getString(1), numOfChapters);
+                    Grade grade = new Grade(cursor.getInt(0), cursor.getString(1));
                     grades.add(grade);
                 } while (cursor.moveToNext());
             }

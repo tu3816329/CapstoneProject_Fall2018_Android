@@ -19,14 +19,12 @@ public class Grade implements Serializable {
     private Version version;
 
     private boolean isChosen;
-    private int numOfChapters;
 
     public Grade() {}
 
-    public Grade(int id, String gradeName, int numOfChapters) {
+    public Grade(int id, String gradeName) {
         this.id = id;
         this.gradeName = gradeName;
-        this.numOfChapters = numOfChapters;
     }
 
     public int getId() {
@@ -59,14 +57,6 @@ public class Grade implements Serializable {
 
     public void setChosen(boolean chosen) {
         isChosen = chosen;
-    }
-
-    public int getNumOfChapters() {
-        return numOfChapters;
-    }
-
-    public void setNumOfChapters(int numOfChapters) {
-        this.numOfChapters = numOfChapters;
     }
 
     @Override

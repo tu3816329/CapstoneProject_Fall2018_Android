@@ -38,12 +38,14 @@
                 android:layout_height="wrap_content"
                 android:padding="1dp"
                 android:textColor="#FFF"
-                android:textSize="20sp" />
+                android:fontFamily="@font/play_regular"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/txtNumberOfChapter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/play_regular"
                 android:padding="1dp"
                 android:textColor="#FFF" />
         </LinearLayout>

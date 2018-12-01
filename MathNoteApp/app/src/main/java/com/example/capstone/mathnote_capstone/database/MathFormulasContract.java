@@ -2,7 +2,7 @@ package com.example.capstone.mathnote_capstone.database;
 
 public final class MathFormulasContract {
 
-    public static final String COLUMN_ID = "id";
+    static final String COLUMN_ID = "id";
     public static final String COLUMN_VERSION = "version_id";
 
     private MathFormulasContract(){}

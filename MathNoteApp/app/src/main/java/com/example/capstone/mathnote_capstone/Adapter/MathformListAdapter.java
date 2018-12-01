@@ -40,7 +40,7 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
         MathFormulasDao dao = new MathFormulasDao(context);
         List<Exercise> exercises = dao.getExercisesByMathform(mathform.getId());
         // WebView data
-        StringBuilder data = new StringBuilder(AppUtils.MATHJAX1 + mathform.getMathformContent());
+        final StringBuilder data = new StringBuilder(AppUtils.MATHJAX1 + mathform.getMathformContent());
 
         if(!exercises.isEmpty()) {
             data.append("<h4 style=\"color: #6508a8\">Bài tập thực hành</h4>");
@@ -50,9 +50,6 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
             }
         }
         data.append(AppUtils.MATHJAX2);
-        holder.webView.loadDataWithBaseURL(null, data.toString(), "text/html",
-                "utf-8", "");
-        holder.webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
         //
         holder.mathformTitleTv.setText(mathform.getMathformTitle());
         holder.exerciseNumTv.setText(exercises.size() + " bài tập");
@@ -60,6 +57,12 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
             @Override
             public void onClick(View view) {
                 if (holder.webView.getVisibility() == View.GONE) {
+                    if(!holder.isLoaded) {
+                        holder.isLoaded = true;
+                        holder.webView.loadDataWithBaseURL(null, data.toString(), "text/html",
+                                "utf-8", "");
+                        holder.webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
+                    }
                     holder.webView.setVisibility(View.VISIBLE);
                     holder.mfIndicatorTv.setImageResource(R.drawable.ic_arrow_up);
                 } else if (holder.webView.getVisibility() == View.VISIBLE) {
@@ -76,6 +79,7 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
     }
 
     class RecyclerHolder extends RecyclerView.ViewHolder {
+        private boolean isLoaded;
         private RelativeLayout mathformItemHeader;
         private TextView mathformTitleTv, exerciseNumTv;
         private ImageView mfIndicatorTv;
@@ -83,6 +87,7 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
 
         RecyclerHolder(View itemView) {
             super(itemView);
+            isLoaded = false;
             mathformItemHeader = itemView.findViewById(R.id.mathform_item_header);
             mathformTitleTv = itemView.findViewById(R.id.mathform_title_tv);
             exerciseNumTv = itemView.findViewById(R.id.exercise_num_tv);

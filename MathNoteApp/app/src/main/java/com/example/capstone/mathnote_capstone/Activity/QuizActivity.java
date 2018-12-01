@@ -4,10 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,11 +22,10 @@ import java.util.Objects;
 public class QuizActivity extends AppCompatActivity {
 
     private static int lessonId = 0;
-    private static int categoryId = 0;
+    private static int chapterId = 0;
     private static List<Quiz> quizzes = null;
     private int score = 0;
     private static int questionCount = 0;
-    private static int progress = 0;
     private static Quiz quiz = null;
 
     private WebView webView;
@@ -48,12 +44,12 @@ public class QuizActivity extends AppCompatActivity {
         answerBtn4 = findViewById(R.id.answer_btn_4);
         ImageView closeIv = findViewById(R.id.quiz_close_iv);
 
-        categoryId = getIntent().getExtras().getInt("categoryid");
+        chapterId = getIntent().getExtras().getInt("categoryid");
         final MathFormulasDao dao = new MathFormulasDao(this);
-        lessonId = dao.getNextQuizId(categoryId);
+        lessonId = dao.getNextQuizId(chapterId);
         questionCount = dao.countQuestionsByLesson(lessonId);
         quizzes = dao.getUnansweredQuestion(lessonId);
-        progress = questionCount - quizzes.size();
+        int progress = questionCount - quizzes.size();
 
         quizPb = findViewById(R.id.quiz_pb);
         quizPb.setMax(questionCount);
@@ -64,8 +60,6 @@ public class QuizActivity extends AppCompatActivity {
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        webView.getSettings().setBuiltInZoomControls(true);
-        webView.getSettings().setDisplayZoomControls(false);
 
         moveToNextQuestion();
 
@@ -125,7 +119,7 @@ public class QuizActivity extends AppCompatActivity {
         //
         if (progress == questionCount) {
             dao.setLessonFinish(lessonId);
-            dao.updateChapterProgress(categoryId);
+            dao.updateChapterProgress(chapterId);
             dao.saveQuizScore(lessonId, score);
             reviewQuiz();
         } else {
@@ -143,8 +137,8 @@ public class QuizActivity extends AppCompatActivity {
                 "<p>D. " + quiz.getChoices().get(3).getContent().substring(3) + AppUtils.MATHJAX2;
         webView.loadDataWithBaseURL(null, content, "text/html",
                 "utf-8", "");
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.enter);
-        webView.startAnimation(animation);
+//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.enter);
+//        webView.startAnimation(animation);
         webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");
     }
 
