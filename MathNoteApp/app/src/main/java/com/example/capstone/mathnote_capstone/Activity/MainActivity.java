@@ -208,7 +208,9 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 3) {
-                divisionId = data.getExtras().getInt("divisionid");
+                if(data.getExtras() != null) {
+                    divisionId = data.getExtras().getInt("divisionid");
+                }
                 int index = (divisionId == 1) ? 0 : 1;
                 TabLayout.Tab tab = tabLayout.getTabAt(index);
                 tab.select();
