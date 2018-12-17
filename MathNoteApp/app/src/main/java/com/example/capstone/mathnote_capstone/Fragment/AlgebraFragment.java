@@ -41,13 +41,14 @@ public class AlgebraFragment extends Fragment {
         dao = new MathFormulasDao(getContext());
         // Get chosen grade
         grade = dao.getChosenGrade();
-        // Get chapters by grade and division
-        List<Chapter> chapters = dao.getChaptersByGradeAndDivision(grade.getId(), 1);
-        AlgebraAdapter algebraAdapter = new AlgebraAdapter(AlgebraFragment.this.getContext(), chapters);
+        // Get chapters by grade and subject
+        List<Chapter> chapters = dao.getChaptersByGradeAndSubject(grade.getId(), 1);
+        AlgebraAdapter adapter = new AlgebraAdapter(AlgebraFragment.this.getContext(), chapters);
         categoryRv.addItemDecoration(
                 new DividerItemDecoration(AlgebraFragment.this.getContext(), LinearLayoutManager.VERTICAL)
         );
-        categoryRv.setAdapter(algebraAdapter);
+        categoryRv.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
         return view;
     }
 
@@ -55,7 +56,7 @@ public class AlgebraFragment extends Fragment {
     public void onResume() {
         super.onResume();
         grade = dao.getChosenGrade();
-        List<Chapter> categories = dao.getChaptersByGradeAndDivision(grade.getId(), 1);
+        List<Chapter> categories = dao.getChaptersByGradeAndSubject(grade.getId(), 1);
         AlgebraAdapter adapter = new AlgebraAdapter(this.getContext(), categories);
         categoryRv.setAdapter(adapter);
         adapter.notifyDataSetChanged();

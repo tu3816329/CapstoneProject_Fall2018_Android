@@ -5,19 +5,19 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Mathform implements Serializable {
+public class Solution implements Serializable {
 
     @SerializedName("id")
     @Expose
     private int id;
 
-    @SerializedName("mathformTitle")
+    @SerializedName("title")
     @Expose
-    private String mathformTitle;
+    private String title;
 
-    @SerializedName("mathformContent")
+    @SerializedName("content")
     @Expose
-    private String mathformContent;
+    private String content;
 
     @Expose
     @SerializedName("lessonId")
@@ -27,12 +27,12 @@ public class Mathform implements Serializable {
     @SerializedName("versionId")
     private Version version;
 
-    public Mathform() {}
+    public Solution() {}
 
-    public Mathform(int id, String mathformTitle, String mathformContent) {
+    public Solution(int id, String title, String content) {
         this.id = id;
-        this.mathformTitle = mathformTitle;
-        this.mathformContent = mathformContent;
+        this.title = title;
+        this.content = content;
     }
 
     public int getId() {
@@ -43,20 +43,20 @@ public class Mathform implements Serializable {
         this.id = id;
     }
 
-    public String getMathformTitle() {
-        return mathformTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setMathformTitle(String mathformTitle) {
-        this.mathformTitle = mathformTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getMathformContent() {
-        return mathformContent;
+    public String getContent() {
+        return content;
     }
 
-    public void setMathformContent(String mathformContent) {
-        this.mathformContent = mathformContent;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Lesson getLesson() {

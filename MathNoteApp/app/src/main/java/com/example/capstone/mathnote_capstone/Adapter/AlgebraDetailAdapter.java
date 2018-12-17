@@ -56,9 +56,9 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
             holder.lessonScoreTv.setText(String.valueOf(score));
         }
 
-        String lessonDetail = dao.getMathformByLesson(lessonId).size() + " dạng bài, ";
+        String lessonDetail = dao.getSolutionsByLesson(lessonId).size() + " dạng bài, ";
         lessonDetail += dao.getQuestionsByLesson(lessonId).size() + " câu hỏi";
-        holder.mathformNumTv.setText(lessonDetail);
+        holder.solutionNumTv.setText(lessonDetail);
         holder.lessonTitleTv.setText(lessonTitle);
         final String data = AppUtils.MATHJAX1 + lessonContent + AppUtils.MATHJAX2;
         final Activity activity = (Activity) context;
@@ -135,7 +135,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
         private WebView webView;
         private TextView lessonTitleTv;
         private RelativeLayout lessonItem;
-        private TextView mathformNumTv, lessonScoreTv;
+        private TextView solutionNumTv, lessonScoreTv;
         ProgressBar lessonScorePb, lessonScorePbBackground;
 
         private static AlgebraDetailAdapter.RecyclerHolder buildFor(ViewGroup viewGroup) {
@@ -148,7 +148,7 @@ public final class AlgebraDetailAdapter extends RecyclerView.Adapter<AlgebraDeta
             lessonScorePbBackground = itemView.findViewById(R.id.lesson_score_pb_bg);
             lessonScoreTv = itemView.findViewById(R.id.lesson_score_tv);
             lessonScorePb = itemView.findViewById(R.id.lesson_score_pb);
-            mathformNumTv = itemView.findViewById(R.id.mathforms_num);
+            solutionNumTv = itemView.findViewById(R.id.solutions_num);
             lessonItem = itemView.findViewById(R.id.lesson_item_rl);
             expandBodyLayout = itemView.findViewById(R.id.expand_body_ll);
             lessonTitleTv = itemView.findViewById(R.id.lesson_title_tv);

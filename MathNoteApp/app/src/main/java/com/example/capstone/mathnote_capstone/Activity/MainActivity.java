@@ -12,7 +12,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +24,7 @@ import com.example.capstone.mathnote_capstone.adapter.SearchListAdapter;
 import com.example.capstone.mathnote_capstone.adapter.ViewPagerAdapter;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
-import com.example.capstone.mathnote_capstone.model.Division;
+import com.example.capstone.mathnote_capstone.model.Subject;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.model.Lesson;
 import com.example.capstone.mathnote_capstone.model.SearchResults;
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     private SearchListAdapter adapter;
     List<Lesson> lessons = null;
     String title = "";
-    private static int divisionId = 0;
 
     TextView titleTv;
     TabLayout tabLayout;
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity
 
         /* Get grade name for title */
         MathFormulasDao dao = new MathFormulasDao(this);
-        Bundle bundle = getIntent().getExtras();
         Grade grade = dao.getChosenGrade();
         title = grade.getGradeName();
         titleTv.setText(title);
@@ -121,22 +118,17 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Add division tab
+        // Add subject tab
         tabLayout = findViewById(R.id.tabLayout);
         ViewPager viewPager = findViewById(R.id.viewPager_id);
-        List<Division> divisions = dao.getAllDivisions();
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), divisions);
-        viewPagerAdapter.notifyDataSetChanged();
+        List<Subject> subjects = dao.getAllSubjects();
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), subjects);
 
         //Add Fragment
         viewPager.setAdapter(viewPagerAdapter);
+        viewPagerAdapter.notifyDataSetChanged();
         tabLayout.setupWithViewPager(viewPager);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        // Set selected tab
-        divisionId = getIntent().getExtras().getInt("divisionid");
-        int index = (divisionId == 1) ? 0 : 1;
-        TabLayout.Tab tab = tabLayout.getTabAt(index);
-        tab.select();
         //
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -208,12 +200,6 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 3) {
-                if(data.getExtras() != null) {
-                    divisionId = data.getExtras().getInt("divisionid");
-                }
-                int index = (divisionId == 1) ? 0 : 1;
-                TabLayout.Tab tab = tabLayout.getTabAt(index);
-                tab.select();
                 MathFormulasDao dao = new MathFormulasDao(this);
                 Grade grade = dao.getChosenGrade();
                 titleTv.setText(grade.getGradeName());

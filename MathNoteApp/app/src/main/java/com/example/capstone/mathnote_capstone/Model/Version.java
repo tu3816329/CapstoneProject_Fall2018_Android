@@ -11,10 +11,6 @@ public class Version implements Serializable {
     @Expose
     private int id;
 
-    @SerializedName("databaseVersion")
-    @Expose
-    private int databaseVersion;
-
     @SerializedName("versionName")
     @Expose
     private String versionName;
@@ -28,9 +24,8 @@ public class Version implements Serializable {
     public Version() {
     }
 
-    public Version(int id, int databaseVersion, String versionName, boolean isCurrent) {
+    public Version(int id, String versionName, boolean isCurrent) {
         this.id = id;
-        this.databaseVersion = databaseVersion;
         this.versionName = versionName;
         this.isCurrent = isCurrent;
     }
@@ -41,14 +36,6 @@ public class Version implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getDatabaseVersion() {
-        return databaseVersion;
-    }
-
-    public void setDatabaseVersion(int databaseVersion) {
-        this.databaseVersion = databaseVersion;
     }
 
     public String getVersionName() {
@@ -77,6 +64,6 @@ public class Version implements Serializable {
 
     @Override
     public String toString() {
-        return id + "-" + databaseVersion + "-" + versionName + "-" + isCurrent;
+        return id + "-" + versionName + "-" + isCurrent;
     }
 }

@@ -8,11 +8,11 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import com.example.capstone.mathnote_capstone.model.Chapter;
-import com.example.capstone.mathnote_capstone.model.Division;
+import com.example.capstone.mathnote_capstone.model.Subject;
 import com.example.capstone.mathnote_capstone.model.Exercise;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.model.Lesson;
-import com.example.capstone.mathnote_capstone.model.Mathform;
+import com.example.capstone.mathnote_capstone.model.Solution;
 import com.example.capstone.mathnote_capstone.model.Question;
 import com.example.capstone.mathnote_capstone.model.QuestionChoice;
 import com.example.capstone.mathnote_capstone.model.Quiz;
@@ -815,7 +815,6 @@ public class MathFormulasDao {
             for (Version version : versions) {
                 values = new ContentValues();
                 values.put(MathFormulasContract.COLUMN_ID, version.getId());
-                values.put(MathFormulasContract.VersionEntry.COLUMN_DB_VERSION, version.getDatabaseVersion());
                 values.put(MathFormulasContract.VersionEntry.COLUMN_VERSION_NAME, version.getVersionName());
                 values.put(MathFormulasContract.VersionEntry.COLUMN_IS_CURRENT, version.isCurrent());
                 values.put(MathFormulasContract.VersionEntry.COLUMN_UPDATE_DAY, AppUtils.getCurrentDateTime());
@@ -852,24 +851,24 @@ public class MathFormulasDao {
         return flag;
     }
 
-    private Division getDivisionById(int divisionId) {
+    private Subject getSubjectById(int subjectId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
-        Division division = null;
+        Subject subject = null;
         try {
             rdb = dbHelper.getReadableDatabase();
             cursor = rdb.query(
-                    MathFormulasContract.DivisionEntry.TABLE_NAME, null,
+                    MathFormulasContract.SubjectEntry.TABLE_NAME, null,
                     MathFormulasContract.COLUMN_ID + " = ?",
-                    new String[]{divisionId + ""}, null, null, null, null
+                    new String[]{subjectId + ""}, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
-                division = new Division(
+                subject = new Subject(
                         cursor.getInt(0), cursor.getString(1)
                 );
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getDivisionById", e.getLocalizedMessage());
+            Log.i("Dao_getSubjectById", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -878,7 +877,7 @@ public class MathFormulasDao {
                 rdb.close();
             }
         }
-        return division;
+        return subject;
     }
 
     public Chapter getChapterById(int chapterId) {
@@ -957,20 +956,21 @@ public class MathFormulasDao {
         return grade;
     }
 
-    private int getChaptersCountByGrade(int gradeId) {
+    public int countChaptersByGrade(int gradeId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
         int count = 0;
-
         try {
             rdb = dbHelper.getReadableDatabase();
-            cursor = rdb.query(MathFormulasContract.ChapterEntry.TABLE_NAME,
-                    null,
-                    MathFormulasContract.ChapterEntry.COLUMN_GRADE_ID + " = ?",
-                    new String[]{gradeId + ""}, null, null, null);
-            count = cursor.getCount();
+            String selection = MathFormulasContract.ChapterEntry.COLUMN_GRADE_ID + " = ?";
+            cursor = rdb.query(
+                    MathFormulasContract.ChapterEntry.TABLE_NAME,
+                    null, selection, new String[]{gradeId + ""},
+                    null, null, null
+            );
+            count = cursor != null ? cursor.getCount() : 0;
         } catch (SQLiteException e) {
-            Log.i("Dao_getCatsCountByGrade", e.getLocalizedMessage());
+            Log.i("Dao_countChapByGrade", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -982,32 +982,32 @@ public class MathFormulasDao {
         return count;
     }
 
-    public List<Chapter> getChaptersByGradeAndDivision(int gradeId, int divisionId) {
+    public List<Chapter> getChaptersByGradeAndSubject(int gradeId, int subjectId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
         List<Chapter> chapters = new ArrayList<>();
         try {
             rdb = dbHelper.getReadableDatabase();
-            String selection = MathFormulasContract.ChapterEntry.COLUMN_DIVISION_ID + " = ? AND " +
+            String selection = MathFormulasContract.ChapterEntry.COLUMN_SUBJECT_ID + " = ? AND " +
                     MathFormulasContract.ChapterEntry.COLUMN_GRADE_ID + " = ?";
             cursor = rdb.query(
                     MathFormulasContract.ChapterEntry.TABLE_NAME,
-                    null, selection, new String[]{divisionId + "", gradeId + ""},
+                    null, selection, new String[]{subjectId + "", gradeId + ""},
                     null, null, null
             );
 
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    Division division = getDivisionById(divisionId);
+                    Subject subject = getSubjectById(subjectId);
                     Chapter chapter = new Chapter(
-                            cursor.getInt(0), cursor.getString(1), cursor.getString(2), division
+                            cursor.getInt(0), cursor.getString(1), cursor.getString(2), subject
                     );
                     chapter.setProgress(cursor.getInt(6));
                     chapters.add(chapter);
                 } while (cursor.moveToNext());
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getAllGrades", e.getLocalizedMessage());
+            Log.i("Dao_chapByGradeAndSub", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -1049,25 +1049,25 @@ public class MathFormulasDao {
         return grades;
     }
 
-    public List<Division> getAllDivisions() {
+    public List<Subject> getAllSubjects() {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
-        List<Division> divisions = new ArrayList<>();
+        List<Subject> subjects = new ArrayList<>();
 
         try {
             rdb = dbHelper.getReadableDatabase();
             cursor = rdb.query(
-                    MathFormulasContract.DivisionEntry.TABLE_NAME,
+                    MathFormulasContract.SubjectEntry.TABLE_NAME,
                     null, null, null, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    Division division = new Division(cursor.getInt(0), cursor.getString(1));
-                    divisions.add(division);
+                    Subject subject = new Subject(cursor.getInt(0), cursor.getString(1));
+                    subjects.add(subject);
                 } while (cursor.moveToNext());
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getAllDivisions", e.getLocalizedMessage());
+            Log.i("Dao_getAllSubjects", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -1076,7 +1076,7 @@ public class MathFormulasDao {
                 rdb.close();
             }
         }
-        return divisions;
+        return subjects;
     }
 
     public List<Lesson> getAllLessons() {
@@ -1171,7 +1171,7 @@ public class MathFormulasDao {
                 } while (cursor.moveToNext());
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getLessonsByCat", e.getLocalizedMessage());
+            Log.i("Dao_getLessonsByChap", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -1183,24 +1183,24 @@ public class MathFormulasDao {
         return lessons;
     }
 
-    public List<Mathform> getMathformByLesson(int lessonId) {
+    public List<Solution> getSolutionsByLesson(int lessonId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
-        List<Mathform> mathforms = new ArrayList<>();
+        List<Solution> solutions = new ArrayList<>();
 
         try {
             rdb = dbHelper.getWritableDatabase();
             cursor = rdb.query(
-                    MathFormulasContract.MathformEntry.TABLE_NAME, null,
-                    MathFormulasContract.MathformEntry.COLUMN_LESSON_ID + " = ?",
+                    MathFormulasContract.SolutionEntry.TABLE_NAME, null,
+                    MathFormulasContract.SolutionEntry.COLUMN_LESSON_ID + " = ?",
                     new String[]{lessonId + ""}, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    Mathform mathform = new Mathform(
+                    Solution solution = new Solution(
                             cursor.getInt(0), cursor.getString(1), cursor.getString(2)
                     );
-                    mathforms.add(mathform);
+                    solutions.add(solution);
                 } while (cursor.moveToNext());
             }
         } catch (SQLiteException e) {
@@ -1213,10 +1213,10 @@ public class MathFormulasDao {
                 rdb.close();
             }
         }
-        return mathforms;
+        return solutions;
     }
 
-    public List<Exercise> getExercisesByMathform(int mathformId) {
+    public List<Exercise> getExercisesBySolution(int solutionId) {
         SQLiteDatabase rdb = null;
         Cursor cursor = null;
         List<Exercise> exercises = new ArrayList<>();
@@ -1225,8 +1225,8 @@ public class MathFormulasDao {
             rdb = dbHelper.getWritableDatabase();
             cursor = rdb.query(
                     MathFormulasContract.ExerciseEntry.TABLE_NAME, null,
-                    MathFormulasContract.ExerciseEntry.COLUMN_MATHFORM_ID + " = ?",
-                    new String[]{mathformId + ""}, null, null, null
+                    MathFormulasContract.ExerciseEntry.COLUMN_SOLUTION_ID + " = ?",
+                    new String[]{solutionId + ""}, null, null, null
             );
             if (cursor != null && cursor.moveToFirst()) {
                 do {
@@ -1237,7 +1237,7 @@ public class MathFormulasDao {
                 } while (cursor.moveToNext());
             }
         } catch (SQLiteException e) {
-            Log.i("Dao_getExsByMathform", e.getLocalizedMessage());
+            Log.i("Dao_getExsBySolution", e.getLocalizedMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -1262,15 +1262,15 @@ public class MathFormulasDao {
                     wdb.insert(MathFormulasContract.GradeEntry.TABLE_NAME, null, values);
                 }
             }
-            // Divisions
-            List<Division> divisions = data.getDivisions();
-            if (divisions != null && !divisions.isEmpty()) {
-                for (Division division : divisions) {
+            // Subjects
+            List<Subject> subjects = data.getSubjects();
+            if (subjects != null && !subjects.isEmpty()) {
+                for (Subject subject : subjects) {
                     ContentValues values = new ContentValues();
-                    values.put(MathFormulasContract.COLUMN_ID, division.getId());
-                    values.put(MathFormulasContract.DivisionEntry.COLUMN_NAME, division.getDivisionName());
-                    values.put(MathFormulasContract.COLUMN_VERSION, division.getVersion().getId());
-                    wdb.insert(MathFormulasContract.DivisionEntry.TABLE_NAME, null, values);
+                    values.put(MathFormulasContract.COLUMN_ID, subject.getId());
+                    values.put(MathFormulasContract.SubjectEntry.COLUMN_NAME, subject.getSubjectName());
+                    values.put(MathFormulasContract.COLUMN_VERSION, subject.getVersion().getId());
+                    wdb.insert(MathFormulasContract.SubjectEntry.TABLE_NAME, null, values);
                 }
             }
             // Chapters
@@ -1283,7 +1283,7 @@ public class MathFormulasDao {
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_NAME, chapter.getChapterName());
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_ICON, chapter.getChapterIcon());
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_GRADE_ID, chapter.getGrade().getId());
-                        values.put(MathFormulasContract.ChapterEntry.COLUMN_DIVISION_ID, chapter.getDivision().getId());
+                        values.put(MathFormulasContract.ChapterEntry.COLUMN_SUBJECT_ID, chapter.getSubject().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, chapter.getVersion().getId());
                         wdb.update(
                                 MathFormulasContract.ChapterEntry.TABLE_NAME, values,
@@ -1296,7 +1296,7 @@ public class MathFormulasDao {
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_NAME, chapter.getChapterName());
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_ICON, chapter.getChapterIcon());
                         values.put(MathFormulasContract.ChapterEntry.COLUMN_GRADE_ID, chapter.getGrade().getId());
-                        values.put(MathFormulasContract.ChapterEntry.COLUMN_DIVISION_ID, chapter.getDivision().getId());
+                        values.put(MathFormulasContract.ChapterEntry.COLUMN_SUBJECT_ID, chapter.getSubject().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, chapter.getVersion().getId());
                         wdb.insert(MathFormulasContract.ChapterEntry.TABLE_NAME, null, values);
                     }
@@ -1330,29 +1330,29 @@ public class MathFormulasDao {
                 }
             }
             // Math forms
-            List<Mathform> mathforms = data.getMathforms();
-            if (mathforms != null && !mathforms.isEmpty()) {
-                for (Mathform mathform : mathforms) {
+            List<Solution> solutions = data.getSolutions();
+            if (solutions != null && !solutions.isEmpty()) {
+                for (Solution solution : solutions) {
                     ContentValues values = new ContentValues();
-                    if (checkExistRecord(MathFormulasContract.MathformEntry.TABLE_NAME, mathform.getId())) {
+                    if (checkExistRecord(MathFormulasContract.SolutionEntry.TABLE_NAME, solution.getId())) {
                         // Edit math form
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_TITLE, mathform.getMathformTitle());
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_CONTENT, mathform.getMathformContent());
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_LESSON_ID, mathform.getLesson().getId());
-                        values.put(MathFormulasContract.COLUMN_VERSION, mathform.getVersion().getId());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_TITLE, solution.getTitle());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_CONTENT, solution.getContent());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_LESSON_ID, solution.getLesson().getId());
+                        values.put(MathFormulasContract.COLUMN_VERSION, solution.getVersion().getId());
                         wdb.update(
-                                MathFormulasContract.MathformEntry.TABLE_NAME, values,
+                                MathFormulasContract.SolutionEntry.TABLE_NAME, values,
                                 MathFormulasContract.COLUMN_ID + " = ?",
-                                new String[]{mathform.getId() + ""}
+                                new String[]{solution.getId() + ""}
                         );
                     } else {
                         // Insert math form
-                        values.put(MathFormulasContract.COLUMN_ID, mathform.getId());
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_TITLE, mathform.getMathformTitle());
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_CONTENT, mathform.getMathformContent());
-                        values.put(MathFormulasContract.MathformEntry.COLUMN_LESSON_ID, mathform.getLesson().getId());
-                        values.put(MathFormulasContract.COLUMN_VERSION, mathform.getVersion().getId());
-                        wdb.insert(MathFormulasContract.MathformEntry.TABLE_NAME, null, values);
+                        values.put(MathFormulasContract.COLUMN_ID, solution.getId());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_TITLE, solution.getTitle());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_CONTENT, solution.getContent());
+                        values.put(MathFormulasContract.SolutionEntry.COLUMN_LESSON_ID, solution.getLesson().getId());
+                        values.put(MathFormulasContract.COLUMN_VERSION, solution.getVersion().getId());
+                        wdb.insert(MathFormulasContract.SolutionEntry.TABLE_NAME, null, values);
                     }
                 }
             }
@@ -1365,7 +1365,7 @@ public class MathFormulasDao {
                         // Edit exercise
                         values.put(MathFormulasContract.ExerciseEntry.COLUMN_TOPIC, exercise.getTopic());
                         values.put(MathFormulasContract.ExerciseEntry.COLUMN_ANSWER, exercise.getAnswer());
-                        values.put(MathFormulasContract.ExerciseEntry.COLUMN_MATHFORM_ID, exercise.getMathform().getId());
+                        values.put(MathFormulasContract.ExerciseEntry.COLUMN_SOLUTION_ID, exercise.getSolution().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, exercise.getVersion().getId());
                         wdb.update(
                                 MathFormulasContract.ExerciseEntry.TABLE_NAME, values,
@@ -1377,7 +1377,7 @@ public class MathFormulasDao {
                         values.put(MathFormulasContract.COLUMN_ID, exercise.getId());
                         values.put(MathFormulasContract.ExerciseEntry.COLUMN_TOPIC, exercise.getTopic());
                         values.put(MathFormulasContract.ExerciseEntry.COLUMN_ANSWER, exercise.getAnswer());
-                        values.put(MathFormulasContract.ExerciseEntry.COLUMN_MATHFORM_ID, exercise.getMathform().getId());
+                        values.put(MathFormulasContract.ExerciseEntry.COLUMN_SOLUTION_ID, exercise.getSolution().getId());
                         values.put(MathFormulasContract.COLUMN_VERSION, exercise.getVersion().getId());
                         wdb.insert(MathFormulasContract.ExerciseEntry.TABLE_NAME, null, values);
                     }

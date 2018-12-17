@@ -13,34 +13,34 @@ import android.widget.TextView;
 import com.example.capstone.mathnote_capstone.R;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
 import com.example.capstone.mathnote_capstone.model.Exercise;
-import com.example.capstone.mathnote_capstone.model.Mathform;
+import com.example.capstone.mathnote_capstone.model.Solution;
 import com.example.capstone.mathnote_capstone.utils.AppUtils;
 
 import java.util.List;
 
-public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapter.RecyclerHolder> {
+public class SolutionListAdapter extends RecyclerView.Adapter<SolutionListAdapter.RecyclerHolder> {
 
     private Context context;
-    private List<Mathform> mathforms;
+    private List<Solution> solutions;
 
-    public MathformListAdapter(Context context, List<Mathform> mathforms) {
+    public SolutionListAdapter(Context context, List<Solution> solutions) {
         this.context = context;
-        this.mathforms = mathforms;
+        this.solutions = solutions;
     }
 
     @Override
-    public MathformListAdapter.RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SolutionListAdapter.RecyclerHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.mathform_list_item, parent, false);
         return new RecyclerHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(final MathformListAdapter.RecyclerHolder holder, int position) {
-        Mathform mathform = mathforms.get(position);
+    public void onBindViewHolder(final SolutionListAdapter.RecyclerHolder holder, int position) {
+        Solution solution = solutions.get(position);
         MathFormulasDao dao = new MathFormulasDao(context);
-        List<Exercise> exercises = dao.getExercisesByMathform(mathform.getId());
+        List<Exercise> exercises = dao.getExercisesBySolution(solution.getId());
         // WebView data
-        final StringBuilder data = new StringBuilder(AppUtils.MATHJAX1 + mathform.getMathformContent());
+        final StringBuilder data = new StringBuilder(AppUtils.MATHJAX1 + solution.getContent());
 
         if(!exercises.isEmpty()) {
             data.append("<h4 style=\"color: #6508a8\">Bài tập thực hành</h4>");
@@ -51,9 +51,9 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
         }
         data.append(AppUtils.MATHJAX2);
         //
-        holder.mathformTitleTv.setText(mathform.getMathformTitle());
+        holder.solutionTitleTv.setText(solution.getTitle());
         holder.exerciseNumTv.setText(exercises.size() + " bài tập");
-        holder.mathformItemHeader.setOnClickListener(new View.OnClickListener() {
+        holder.solutionItemHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (holder.webView.getVisibility() == View.GONE) {
@@ -75,24 +75,24 @@ public class MathformListAdapter extends RecyclerView.Adapter<MathformListAdapte
 
     @Override
     public int getItemCount() {
-        return mathforms.size();
+        return solutions.size();
     }
 
     class RecyclerHolder extends RecyclerView.ViewHolder {
         private boolean isLoaded;
-        private RelativeLayout mathformItemHeader;
-        private TextView mathformTitleTv, exerciseNumTv;
+        private RelativeLayout solutionItemHeader;
+        private TextView solutionTitleTv, exerciseNumTv;
         private ImageView mfIndicatorTv;
         private WebView webView;
 
         RecyclerHolder(View itemView) {
             super(itemView);
             isLoaded = false;
-            mathformItemHeader = itemView.findViewById(R.id.mathform_item_header);
-            mathformTitleTv = itemView.findViewById(R.id.mathform_title_tv);
+            solutionItemHeader = itemView.findViewById(R.id.solution_item_header);
+            solutionTitleTv = itemView.findViewById(R.id.solution_title_tv);
             exerciseNumTv = itemView.findViewById(R.id.exercise_num_tv);
-            mfIndicatorTv = itemView.findViewById(R.id.mf_indicator_iv);
-            webView = itemView.findViewById(R.id.mathform_detail_wv);
+            mfIndicatorTv = itemView.findViewById(R.id.solution_indicator_iv);
+            webView = itemView.findViewById(R.id.solution_detail_wv);
             // Web view configuration
             webView.getSettings().setLoadsImagesAutomatically(true);
             webView.getSettings().setJavaScriptEnabled(true);

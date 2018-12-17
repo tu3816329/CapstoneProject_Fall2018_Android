@@ -14,19 +14,17 @@ import java.util.List;
 
 import com.example.capstone.mathnote_capstone.activity.MainActivity;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
-import com.example.capstone.mathnote_capstone.model.Division;
 import com.example.capstone.mathnote_capstone.model.Grade;
 import com.example.capstone.mathnote_capstone.R;
-import com.example.capstone.mathnote_capstone.model.Subject;
 
 public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapterHolder> {
     private Context context;
     private LayoutInflater layoutInflater;
-    private List<Subject> subjects;
+    private List<Grade> grades;
 
-    public GradeAdapter(Context context, List<Subject> subjects) {
+    public GradeAdapter(Context context, List<Grade> grades) {
         this.context = context;
-        this.subjects = subjects;
+        this.grades = grades;
         layoutInflater = LayoutInflater.from(context);
     }
 
@@ -38,32 +36,18 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapter
 
     @Override
     public void onBindViewHolder(GradeAdapterHolder holder, int position) {
-        final Subject subject = this.subjects.get(position);
-        final Grade grade = subject.getGrade();
-        final Division division = subject.getDivision();
+        final Grade grade = this.grades.get(position);
         final MathFormulasDao dao = new MathFormulasDao(context);
 
         if (grade.getGradeName().contains("10")) {
-            if (division.getId() == 1) {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.daiso_10));
-            } else {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.hinhhoc_10));
-            }
+            holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.lop10));
         } else if (grade.getGradeName().contains("11")) {
-            if (division.getId() == 1) {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.daiso_11));
-            } else {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.hinhhoc_11));
-            }
-        } else {
-            if (division.getId() == 1) {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.daiso_12));
-            } else {
-                holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.hinhhoc_12));
-            }
+            holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.lop11));
+        } else if (grade.getGradeName().contains("12")) {
+            holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.lop12));
         }
-        holder.txtGradeName.setText(grade.getGradeName() + " (" + division.getDivisionName() + ")");
-        holder.txtNumOfChapters.setText(String.valueOf(dao.getChaptersByGradeAndDivision(grade.getId(), division.getId()).size() + " chapters"));
+//        holder.txtGradeName.setText(grade.getGradeName());
+        holder.txtNumOfChapters.setText(String.valueOf(dao.countChaptersByGrade(grade.getId()) + " chương"));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,10 +56,9 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapter
                 String previousActivity = activity.getIntent().getStringExtra("activity");
                 if (previousActivity.equals("instruction")) { // First time use
                     Intent intent = new Intent(context, MainActivity.class);
-                    intent.putExtra("divisionid", division.getId());
                     context.startActivity(intent);
                 } else if (previousActivity.equals("main")) { // User click to grade item
-                    activity.setResult(Activity.RESULT_OK, new Intent().putExtra("divisionid", division.getId()));
+                    activity.setResult(Activity.RESULT_OK);
                     activity.finish();
                 }
                 activity.overridePendingTransition(R.anim.enter, R.anim.exit);
@@ -85,7 +68,7 @@ public class GradeAdapter extends RecyclerView.Adapter<GradeAdapter.GradeAdapter
 
     @Override
     public int getItemCount() {
-        return subjects.size();
+        return grades.size();
     }
 
     class GradeAdapterHolder extends RecyclerView.ViewHolder {

@@ -1,29 +1,58 @@
 package com.example.capstone.mathnote_capstone.model;
 
-public class Subject {
-    private Grade grade;
-    private Division division;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    public Subject() {}
+import java.io.Serializable;
 
-    public Subject(Grade grade, Division division) {
-        this.grade = grade;
-        this.division = division;
+public class Subject implements Serializable {
+
+    @SerializedName("id")
+    @Expose
+    private int id;
+
+    @SerializedName("subjectName")
+    @Expose
+    private String subjectName;
+
+    @SerializedName("versionId")
+    @Expose
+    private Version version;
+
+    public Subject() {
     }
 
-    public Grade getGrade() {
-        return grade;
+    public Subject(int id, String subjectName) {
+        this.id = id;
+        this.subjectName = subjectName;
     }
 
-    public void setGrade(Grade grade) {
-        this.grade = grade;
+    public int getId() {
+        return id;
     }
 
-    public Division getDivision() {
-        return division;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setDivision(Division division) {
-        this.division = division;
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public Version getVersion() {
+        return version;
+    }
+
+    public void setVersion(Version version) {
+        this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return id + "-" + subjectName + "-" + version;
     }
 }

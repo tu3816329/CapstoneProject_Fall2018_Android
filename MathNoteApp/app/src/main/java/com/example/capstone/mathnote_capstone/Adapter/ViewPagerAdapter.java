@@ -3,26 +3,27 @@ package com.example.capstone.mathnote_capstone.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
 import com.example.capstone.mathnote_capstone.fragment.AlgebraFragment;
 import com.example.capstone.mathnote_capstone.fragment.GeometryFragment;
-import com.example.capstone.mathnote_capstone.model.Division;
+import com.example.capstone.mathnote_capstone.model.Subject;
 
 import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
 
-    private List<Division> divisions;
+    private List<Subject> subjects;
 
-    public ViewPagerAdapter(FragmentManager fm, List<Division> divisions) {
+    public ViewPagerAdapter(FragmentManager fm, List<Subject> subjects) {
         super(fm);
-        this.divisions = divisions;
+        this.subjects = subjects;
     }
 
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = null;
-        switch (divisions.get(position).getId()) {
+        switch (subjects.get(position).getId()) {
             case 1 :
                 fragment = new AlgebraFragment();
                 break;
@@ -35,11 +36,11 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return divisions.size();
+        return subjects.size();
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return divisions.get(position).getDivisionName();
+        return subjects.get(position).getSubjectName();
     }
 }

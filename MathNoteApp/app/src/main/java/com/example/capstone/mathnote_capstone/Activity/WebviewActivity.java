@@ -14,11 +14,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.capstone.mathnote_capstone.R;
-import com.example.capstone.mathnote_capstone.adapter.MathformListAdapter;
+import com.example.capstone.mathnote_capstone.adapter.SolutionListAdapter;
 import com.example.capstone.mathnote_capstone.database.MathFormulasDao;
-import com.example.capstone.mathnote_capstone.model.Exercise;
 import com.example.capstone.mathnote_capstone.model.Lesson;
-import com.example.capstone.mathnote_capstone.model.Mathform;
+import com.example.capstone.mathnote_capstone.model.Solution;
 import com.example.capstone.mathnote_capstone.utils.AppUtils;
 
 import java.util.List;
@@ -66,12 +65,12 @@ public class WebviewActivity extends AppCompatActivity {
                 }
             }
         });
-        // Mathform recyclerview
-        RecyclerView mathformRv = findViewById(R.id.mathform_rv);
-        mathformRv.setLayoutManager(new LinearLayoutManager(this));
-        List<Mathform> mathforms = dao.getMathformByLesson(lesson.getId());
-        MathformListAdapter adapter = new MathformListAdapter(this, mathforms);
-        mathformRv.setAdapter(adapter);
+        // Solution recyclerview
+        RecyclerView solutionRv = findViewById(R.id.solution_rv);
+        solutionRv.setLayoutManager(new LinearLayoutManager(this));
+        List<Solution> solutions = dao.getSolutionsByLesson(lesson.getId());
+        SolutionListAdapter adapter = new SolutionListAdapter(this, solutions);
+        solutionRv.setAdapter(adapter);
 
         // WebView configuration
         WebView webView = findViewById(R.id.webview);
@@ -82,7 +81,7 @@ public class WebviewActivity extends AppCompatActivity {
 //        webView.getSettings().setBuiltInZoomControls(true);
 //        webView.getSettings().setDisplayZoomControls(false);
 
-        // Get mathforms
+        // Get solutions
         String data = AppUtils.MATHJAX1 + lesson.getLessonContent() + AppUtils.MATHJAX2;
         webView.loadDataWithBaseURL(null, data.toString(), "text/html", "utf-8", "");
         webView.loadUrl("javascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);");

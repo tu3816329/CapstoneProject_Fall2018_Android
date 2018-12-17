@@ -23,9 +23,9 @@ public class Chapter implements Serializable {
     @Expose
     private Grade grade;
 
-    @SerializedName("divisionId")
+    @SerializedName("subjectId")
     @Expose
-    private Division division;
+    private Subject subject;
 
     @SerializedName("versionId")
     @Expose
@@ -36,11 +36,11 @@ public class Chapter implements Serializable {
     public Chapter() {
     }
 
-    public Chapter(int id, String categoryName, String categoryIcon, Division division) {
+    public Chapter(int id, String chapterName, String chapterIcon, Subject subject) {
         this.id = id;
-        this.chapterName = categoryName;
-        this.chapterIcon = categoryIcon;
-        this.division = division;
+        this.chapterName = chapterName;
+        this.chapterIcon = chapterIcon;
+        this.subject = subject;
     }
 
     public int getId() {
@@ -75,12 +75,12 @@ public class Chapter implements Serializable {
         this.grade = grade;
     }
 
-    public Division getDivision() {
-        return division;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setDivision(Division division) {
-        this.division = division;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public Version getVersion() {
@@ -101,6 +101,6 @@ public class Chapter implements Serializable {
 
     @Override
     public String toString() {
-        return id + " | " + chapterName + " | " + grade.getGradeName() + " | " + division.getDivisionName() + " | " + chapterIcon;
+        return id + " | " + chapterName + " | " + grade.getGradeName() + " | " + subject.getSubjectName() + " | " + chapterIcon;
     }
 }

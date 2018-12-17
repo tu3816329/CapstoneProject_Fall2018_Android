@@ -46,7 +46,7 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
         int score = dao.getQuizScore(lessonId);
         holder.lessonScorePb.setProgress(score);
         holder.lessonScoreTv.setText(score + "");
-        holder.mathformNumTv.setText(dao.getMathformByLesson(lessonId).size() + " dạng bài");
+        holder.solutionNumTv.setText(dao.getSolutionsByLesson(lessonId).size() + " dạng bài");
         lessonTitleTv.setText(lessonTitle);
         final Activity activity = (Activity) context;
         holder.lessonDetailIb.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +86,7 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
 
         private static final int LAYOUT = R.layout.favorite_list_item;
         private ImageButton removeIb, lessonDetailIb;
-        private TextView mathformNumTv, lessonScoreTv;
+        private TextView solutionNumTv, lessonScoreTv;
         ProgressBar lessonScorePb;
 
         private static FavoriteListAdapter.RecyclerHolder buildFor(ViewGroup viewGroup) {
@@ -97,7 +97,7 @@ public class FavoriteListAdapter extends RecyclerView.Adapter<FavoriteListAdapte
             super(itemView);
             lessonScoreTv = itemView.findViewById(R.id.lesson_score_tv2);
             lessonScorePb = itemView.findViewById(R.id.lesson_score_pb2);
-            mathformNumTv = itemView.findViewById(R.id.mathforms_num2);
+            solutionNumTv = itemView.findViewById(R.id.solutions_num2);
             lessonTitleTv = itemView.findViewById(R.id.lesson_title_tv2);
             lessonDetailIb = itemView.findViewById(R.id.lesson_detail_ib2);
             removeIb = itemView.findViewById(R.id.remove_favorite_ib);

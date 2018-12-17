@@ -11,11 +11,11 @@ public class Lesson implements Serializable{
     @Expose
     private int id;
 
-    @SerializedName("lessonTitle")
+    @SerializedName("title")
     @Expose
     private String lessonTitle;
 
-    @SerializedName("lessonContent")
+    @SerializedName("content")
     @Expose
     private String lessonContent;
 

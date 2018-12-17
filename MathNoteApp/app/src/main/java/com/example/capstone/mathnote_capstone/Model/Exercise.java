@@ -20,8 +20,8 @@ public class Exercise implements Serializable {
     private String answer;
 
     @Expose
-    @SerializedName("mathformId")
-    private Mathform mathform;
+    @SerializedName("solutionId")
+    private Solution solution;
 
     @Expose
     @SerializedName("versionId")
@@ -29,10 +29,10 @@ public class Exercise implements Serializable {
 
     public Exercise() {}
 
-    public Exercise(String topic, String answer, Mathform mathform) {
+    public Exercise(String topic, String answer, Solution solution) {
         this.topic = topic;
         this.answer = answer;
-        this.mathform = mathform;
+        this.solution = solution;
     }
 
     public int getId() {
@@ -59,12 +59,12 @@ public class Exercise implements Serializable {
         this.answer = answer;
     }
 
-    public Mathform getMathform() {
-        return mathform;
+    public Solution getSolution() {
+        return solution;
     }
 
-    public void setMathform(Mathform mathform) {
-        this.mathform = mathform;
+    public void setSolution(Solution solution) {
+        this.solution = solution;
     }
 
     public Version getVersion() {

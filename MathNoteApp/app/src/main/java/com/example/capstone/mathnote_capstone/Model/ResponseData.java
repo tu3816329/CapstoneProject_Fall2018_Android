@@ -13,8 +13,8 @@ public class ResponseData implements Serializable {
     private List<Grade> grades;
 
     @Expose
-    @SerializedName("divisions")
-    private List<Division> divisions;
+    @SerializedName("subjects")
+    private List<Subject> subjects;
 
     @Expose
     @SerializedName("chapters")
@@ -25,8 +25,8 @@ public class ResponseData implements Serializable {
     private List<Lesson> lessons;
 
     @Expose
-    @SerializedName("mathforms")
-    private List<Mathform> mathforms;
+    @SerializedName("solutions")
+    private List<Solution> solutions;
 
     @Expose
     @SerializedName("exercises")
@@ -47,14 +47,14 @@ public class ResponseData implements Serializable {
     public ResponseData() {}
 
     public ResponseData(
-            List<Grade> grades, List<Division> divisions, List<Chapter> chapters, List<Lesson> lessons,
-            List<Mathform> mathforms, List<Exercise> exercises, List<Question> questions,
+            List<Grade> grades, List<Subject> subjects, List<Chapter> chapters, List<Lesson> lessons,
+            List<Solution> solutions, List<Exercise> exercises, List<Question> questions,
             List<QuestionChoice> choices, List<DeleteQuery> queries) {
         this.grades = grades;
-        this.divisions = divisions;
+        this.subjects = subjects;
         this.chapters = chapters;
         this.lessons = lessons;
-        this.mathforms = mathforms;
+        this.solutions = solutions;
         this.exercises = exercises;
         this.questions = questions;
         this.choices = choices;
@@ -69,12 +69,12 @@ public class ResponseData implements Serializable {
         this.grades = grades;
     }
 
-    public List<Division> getDivisions() {
-        return divisions;
+    public List<Subject> getSubjects() {
+        return subjects;
     }
 
-    public void setDivisions(List<Division> divisions) {
-        this.divisions = divisions;
+    public void setSubjects(List<Subject> subjects) {
+        this.subjects = subjects;
     }
 
     public List<Chapter> getChapters() {
@@ -93,12 +93,12 @@ public class ResponseData implements Serializable {
         this.lessons = lessons;
     }
 
-    public List<Mathform> getMathforms() {
-        return mathforms;
+    public List<Solution> getSolutions() {
+        return solutions;
     }
 
-    public void setMathforms(List<Mathform> mathforms) {
-        this.mathforms = mathforms;
+    public void setSolutions(List<Solution> solutions) {
+        this.solutions = solutions;
     }
 
     public List<Exercise> getExercises() {

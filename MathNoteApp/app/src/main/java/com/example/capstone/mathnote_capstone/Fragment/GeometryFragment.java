@@ -36,8 +36,8 @@ public class GeometryFragment extends Fragment {
         dao = new MathFormulasDao(getContext());
         // Get chosen grade
         grade = dao.getChosenGrade();
-        // Get categories by grade and division
-        List<Chapter> categories = dao.getChaptersByGradeAndDivision(grade.getId(), 2);
+        // Get chapters by grade and subject
+        List<Chapter> categories = dao.getChaptersByGradeAndSubject(grade.getId(), 2);
         AlgebraAdapter algebraAdapter = new AlgebraAdapter(GeometryFragment.this.getContext(), categories);
         categoryRv.addItemDecoration (
                 new DividerItemDecoration(GeometryFragment.this.getContext(), LinearLayoutManager.VERTICAL)
@@ -50,7 +50,7 @@ public class GeometryFragment extends Fragment {
     public void onResume() {
         super.onResume();
         grade = dao.getChosenGrade();
-        List<Chapter> categories = dao.getChaptersByGradeAndDivision(grade.getId(), 2);
+        List<Chapter> categories = dao.getChaptersByGradeAndSubject(grade.getId(), 2);
         AlgebraAdapter adapter = new AlgebraAdapter(this.getContext(), categories);
         categoryRv.setAdapter(adapter);
         adapter.notifyDataSetChanged();
